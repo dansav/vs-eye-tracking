@@ -46,15 +46,24 @@
     <StartArguments>/rootsuffix Exp</StartArguments>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="GazeScroll.cs" />
+    <Compile Include="Features\Scroll\GazeScroll.cs" />
+    <Compile Include="Common\KeyboardListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EyeTrackingVsixPackage.cs" />
+    <Compile Include="Common\ScrollRequest.cs" />
     <Compile Include="WpfTextViewListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <!-- this is not ideal, but is a workaround to get the native binary into the VSIX file -->
+  <ItemGroup>
+    <Content Include="$(NuGetPackageRoot)tobii.streamengine\2.2.2.363\build\x86\tobii_stream_engine.dll">
+      <Link>tobii_stream_engine.dll</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -75,6 +84,9 @@
       <Version>2.0.4</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="15.9.3" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK.Analyzers">
+      <Version>15.8.36</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.0.2264" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

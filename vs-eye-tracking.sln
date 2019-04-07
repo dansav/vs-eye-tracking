@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{A0A09251-8EAA-4146-921E-E1079A6BA7EA}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		build.cake = build.cake
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection

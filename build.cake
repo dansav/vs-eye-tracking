@@ -34,7 +34,7 @@ Task("Clean")
     EnsureDirectoryExists(buildDir);
 });
 
-Task("Restore-NuGet-Packages")
+Task("Restore")
     .IsDependentOn("Clean")
     .Does(() =>
 {
@@ -42,7 +42,7 @@ Task("Restore-NuGet-Packages")
 });
 
 Task("Build")
-    .IsDependentOn("Restore-NuGet-Packages")
+    .IsDependentOn("Restore")
     .Does(() =>
 {
     if(IsRunningOnWindows())
@@ -75,13 +75,15 @@ Task("PostProcess")
     .IsDependentOn("Build")
     .Does(() =>
 {
+    // NOTE: if the csproj hack works, then this will not be needed
+    
     // add native dlls to vsix package
-    using (var zipArchive = ZipFile.Open(buildDir + File("EyeTrackingVsix.vsix"), ZipArchiveMode.Update))
-    {
-        zipArchive.CreateEntryFromFile(
-            buildDir + File("tobii_stream_engine.dll"),
-            "tobii_stream_engine.dll");
-    }
+    // using (var zipArchive = ZipFile.Open(buildDir + File("EyeTrackingVsix.vsix"), ZipArchiveMode.Update))
+    // {
+    //     zipArchive.CreateEntryFromFile(
+    //         buildDir + File("tobii_stream_engine.dll"),
+    //         "tobii_stream_engine.dll");
+    // }
 
 });
 

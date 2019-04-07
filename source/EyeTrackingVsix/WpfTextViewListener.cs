@@ -1,14 +1,15 @@
-﻿using EyeTrackingVsix;
+﻿using Eyetracking.NET;
+using EyeTrackingVsix.Common;
+using EyeTrackingVsix.Features.Scroll;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 
 namespace EyeTrackingVsix
 {
     /// <summary>
-    /// Establishes an <see cref="IAdornmentLayer"/> to place the adornment on and exports the <see cref="IWpfTextViewCreationListener"/>
-    /// that instantiates the adornment on the event of a <see cref="IWpfTextView"/>'s creation
+    /// Exports the <see cref="IWpfTextViewCreationListener"/> that will be the entry point for
+    /// features that interact with the text editor (<see cref="IWpfTextView"/>)
     /// </summary>
     [Export(typeof(IWpfTextViewCreationListener))]
     [ContentType("text")]
@@ -16,13 +17,14 @@ namespace EyeTrackingVsix
     internal sealed class WpfTextViewListener : IWpfTextViewCreationListener
     {
         /// <summary>
-        /// Creates a PurpleCornerBox adornment manager when a textview is created
+        /// Set up keyboard and eye tracking handling related to text editor
         /// </summary>
-        /// <param name="textView">The <see cref="IWpfTextView"/> upon which the adornment should be placed</param>
+        /// <param name="textView">The <see cref="IWpfTextView"/> used to calculate gaze point</param>
         public void TextViewCreated(IWpfTextView textView)
         {
-            Debug.WriteLine("----- WpfTextViewListener.TextViewCreated");
-            new GazeScroll(textView);
+            var keyboard = new KeyboardListener(textView);
+            var eyetracker = Eyetracker.Desktop;
+            new GazeScroll(textView, keyboard, eyetracker);
         }
     }
 }

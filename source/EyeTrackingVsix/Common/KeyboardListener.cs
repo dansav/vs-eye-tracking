@@ -1,27 +1,28 @@
-﻿using Eyetracking.NET;
-using Microsoft.VisualStudio.Text.Editor;
-using System.Diagnostics;
+﻿using Microsoft.VisualStudio.Text.Editor;
+using System;
 using System.Windows;
 using System.Windows.Input;
 
-namespace EyeTrackingVsix
+namespace EyeTrackingVsix.Common
 {
-    internal class GazeScroll
+    internal class KeyboardListener
     {
-        private IWpfTextView _textView;
-        private IEyetracker _gaze;
+        private readonly IWpfTextView _textView;
 
-        public GazeScroll(IWpfTextView textView)
+        private ScrollRequest _scrollState;
+
+        public KeyboardListener(IWpfTextView textView)
         {
             _textView = textView;
-            _gaze = Eyetracker.Desktop;
 
             _textView.Closed += OnTextViewClosed;
             _textView.VisualElement.Loaded += VisualElementOnLoaded;
             _textView.VisualElement.Unloaded += VisualElementOnUnloaded;
         }
 
-        private void OnTextViewClosed(object sender, System.EventArgs e)
+        public event Action<ScrollRequest> UpdateScroll;
+
+        private void OnTextViewClosed(object sender, EventArgs e)
         {
             _textView.Closed -= OnTextViewClosed;
             _textView.VisualElement.Loaded -= VisualElementOnLoaded;
@@ -44,35 +45,26 @@ namespace EyeTrackingVsix
 
         private void VisualElementOnPreviewKeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.RightCtrl && e.IsUp) Debug.WriteLine("----- UP");
+            if (e.Key == Key.RightCtrl && e.IsUp)
+            {
+                if (_scrollState != ScrollRequest.Stop)
+                {
+                    _scrollState = ScrollRequest.Stop;
+                    UpdateScroll?.Invoke(ScrollRequest.Stop);
+                }
+            }
         }
 
         private void VisualElementOnPreviewKeyDown(object sender, KeyEventArgs e)
         {
+
             if (e.Key == Key.RightCtrl && e.IsDown)
             {
-                var w = System.Windows.Forms.Screen.PrimaryScreen;
-                var gx = _gaze.X * w.WorkingArea.Width;
-                var gy = _gaze.Y * w.WorkingArea.Height;
-
-                var elm = _textView.VisualElement;
-                Point elmTopLeftScreen = elm.PointToScreen(new Point(0, 0));
-                Point elmBottomRightScreen = elm.PointToScreen(new Point(elm.ActualWidth, elm.ActualHeight));
-
-                if (gx > elmTopLeftScreen.X && gx < elmBottomRightScreen.X)
+                if (_scrollState != ScrollRequest.Start)
                 {
-                    if (gy > elmTopLeftScreen.Y && gy < elmBottomRightScreen.Y)
-                    {
-                        var center = elmTopLeftScreen.Y + (elmBottomRightScreen.Y - elmTopLeftScreen.Y) / 2;
-
-                        var scrollLength = (center - gy) / 50;
-                        Debug.WriteLine($"----- scrollLength: {scrollLength}");
-
-                        _textView.ViewScroller.ScrollViewportVerticallyByPixels(scrollLength);
-                    }
+                    _scrollState = ScrollRequest.Start;
+                    UpdateScroll?.Invoke(ScrollRequest.Start);
                 }
-
-                //Debug.WriteLine("----- DOWN");
             }
         }
     }
