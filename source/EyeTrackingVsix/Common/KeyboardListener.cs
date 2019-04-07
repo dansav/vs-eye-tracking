@@ -22,6 +22,8 @@ namespace EyeTrackingVsix.Common
 
         public event Action<ScrollRequest> UpdateScroll;
 
+        public event Action CarretAction;
+
         private void OnTextViewClosed(object sender, EventArgs e)
         {
             _textView.Closed -= OnTextViewClosed;
@@ -45,6 +47,8 @@ namespace EyeTrackingVsix.Common
 
         private void VisualElementOnPreviewKeyUp(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.RightShift && e.IsUp) CarretAction?.Invoke();
+
             if (e.Key == Key.RightCtrl && e.IsUp)
             {
                 if (_scrollState != ScrollRequest.Stop)
@@ -57,7 +61,6 @@ namespace EyeTrackingVsix.Common
 
         private void VisualElementOnPreviewKeyDown(object sender, KeyEventArgs e)
         {
-
             if (e.Key == Key.RightCtrl && e.IsDown)
             {
                 if (_scrollState != ScrollRequest.Start)

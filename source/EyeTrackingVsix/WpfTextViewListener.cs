@@ -1,5 +1,6 @@
 ﻿using Eyetracking.NET;
 using EyeTrackingVsix.Common;
+using EyeTrackingVsix.Features.MoveCarret;
 using EyeTrackingVsix.Features.Scroll;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
@@ -25,6 +26,7 @@ namespace EyeTrackingVsix
             var keyboard = new KeyboardListener(textView);
             var eyetracker = Eyetracker.Desktop;
             new GazeScroll(textView, keyboard, eyetracker);
+            new GazeCaret(textView, keyboard, eyetracker);
         }
     }
 }
