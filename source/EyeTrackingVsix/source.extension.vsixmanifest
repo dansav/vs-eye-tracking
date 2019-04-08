@@ -4,6 +4,9 @@
         <Identity Id="EyeTrackingVsix.65bd244c-48a0-46af-953a-0fb433e5343d" Version="1.0" Language="en-US" Publisher="Daniel Sävhammar" />
         <DisplayName>EyeTrackingVsix</DisplayName>
         <Description>Empty VSIX Project.</Description>
+        <Icon>Resources\logo-eye-code-90.png</Icon>
+        <PreviewImage>Resources\logo-eye-code-175.png</PreviewImage>
+        <Tags>eyetracking, eye tracking</Tags>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[16.0, 17.0)" />

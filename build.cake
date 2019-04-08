@@ -96,6 +96,18 @@ Task("Publish")
     MoveFiles($"{buildDir}/*.vsix", publishDir);
 });
 
+Task("UploadToVsixGallery")
+    .Does(() =>
+{
+    var file = GetFiles($"{publishDir}/*.vsix").First();
+    var repoUrl = "";
+    var repo = System.Web.HttpUtility.UrlEncode(repoUrl);
+    var issueTrackerUrl = "";
+    var issueTracker = System.Web.HttpUtility.UrlEncode(issueTrackerUrl);
+    UploadFile($"http://vsixgallery.com/api/upload?repo={repo}&issuetracker={issueTracker}", file);
+});
+
+
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
