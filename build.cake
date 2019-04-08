@@ -21,6 +21,7 @@ var configuration = Argument("configuration", "Release");
 // Define directories.
 var outputDir = Directory("./output");
 var buildDir = outputDir + Directory("build");
+var publishDir = outputDir + Directory("publish");
 var solution = File("./vs-eye-tracking.sln");
 
 //////////////////////////////////////////////////////////////////////
@@ -32,6 +33,7 @@ Task("Clean")
 {
     CleanDirectory(outputDir);
     EnsureDirectoryExists(buildDir);
+    EnsureDirectoryExists(publishDir);
 });
 
 Task("Restore")
@@ -87,12 +89,19 @@ Task("PostProcess")
 
 });
 
+Task("Publish")
+    .IsDependentOn("PostProcess")
+    .Does(() =>
+{
+    MoveFiles($"{buildDir}/*.vsix", publishDir);
+});
+
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
 
 Task("Default")
-    .IsDependentOn("PostProcess");
+    .IsDependentOn("Publish");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
