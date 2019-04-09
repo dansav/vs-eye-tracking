@@ -1,12 +1,7 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Windows;
-using EnvDTE;
-using EnvDTE80;
 using Eyetracking.NET;
 using EyeTrackingVsix.Common;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 
@@ -29,40 +24,24 @@ namespace EyeTrackingVsix.Features.MoveCarret
 
         private void OnCarretAction()
         {
-            var w = System.Windows.Forms.Screen.PrimaryScreen;
-            var gx = _eyetracker.X * w.WorkingArea.Width;
-            var gy = _eyetracker.Y * w.WorkingArea.Height;
-
             var elm = _textView.VisualElement;
-            var elmTopLeftScreen = elm.PointToScreen(new Point(0, 0));
-            var elmBottomRightScreen = elm.PointToScreen(new Point(elm.ActualWidth, elm.ActualHeight));
+            if (!_eyetracker.IsLookingAt(elm)) return;
 
-            if (gx > elmTopLeftScreen.X && gx < elmBottomRightScreen.X)
+            var gazePoint = elm.GetRelativeGazePoint(_eyetracker);
+            var gazePointInText = new Point(gazePoint.X + _textView.ViewportLeft, gazePoint.Y + _textView.ViewportTop);
+
+            var lookingAtLine = _textView.TextViewLines.GetTextViewLineContainingYCoordinate(gazePointInText.Y);
+
+            if (lookingAtLine == null)
             {
-                if (gy > elmTopLeftScreen.Y && gy < elmBottomRightScreen.Y)
-                {
-                    var localX = gx - elmTopLeftScreen.X;
-                    var localY = gy - elmTopLeftScreen.Y;
+                Debug.WriteLine("Not found...");
+                return;
+            }
 
-                    var lookingAtLine = _textView.TextViewLines.GetTextViewLineContainingYCoordinate(localY + _textView.ViewportTop);
-
-                    if (lookingAtLine == null)
-                    {
-                        Debug.WriteLine("Not found...");
-                        return;
-                    }
-
-                    SnapshotPoint? snapshotPoint = lookingAtLine.GetBufferPositionFromXCoordinate(localX + _textView.ViewportLeft);
-                    if (snapshotPoint.HasValue)
-                    {
-                        _textView.Caret.MoveTo(snapshotPoint.Value);
-
-                        // TODO: no static access
-                        var dte = (DTE2)Package.GetGlobalService(typeof(DTE));
-                        dte.ExecuteCommand("View.QuickActions");
-                    }
-
-                }
+            SnapshotPoint? snapshotPoint = lookingAtLine.GetBufferPositionFromXCoordinate(gazePointInText.X);
+            if (snapshotPoint.HasValue)
+            {
+                _textView.Caret.MoveTo(snapshotPoint.Value);
             }
         }
     }
