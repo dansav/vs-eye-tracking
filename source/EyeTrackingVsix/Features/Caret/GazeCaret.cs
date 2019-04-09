@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using Eyetracking.NET;
 using EyeTrackingVsix.Common;
@@ -29,8 +31,13 @@ namespace EyeTrackingVsix.Features.MoveCarret
 
             var gazePoint = elm.GetRelativeGazePoint(_eyetracker);
             var gazePointInText = new Point(gazePoint.X + _textView.ViewportLeft, gazePoint.Y + _textView.ViewportTop);
+            var verticalMargin = _textView.LineHeight * 3;
 
-            var lookingAtLine = _textView.TextViewLines.GetTextViewLineContainingYCoordinate(gazePointInText.Y);
+            var lookingAtLine = _textView.TextViewLines
+                .Where(l => l.TextTop > gazePointInText.Y - verticalMargin && l.TextBottom < gazePointInText.Y + verticalMargin)
+                .Where(l => l.TextWidth > gazePointInText.X)
+                .OrderBy(l => Math.Abs(l.TextTop + (l.TextBottom - l.TextTop) / 2 - gazePointInText.Y))
+                .FirstOrDefault();
 
             if (lookingAtLine == null)
             {
