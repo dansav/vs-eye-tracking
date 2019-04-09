@@ -46,6 +46,7 @@
     <StartArguments>/rootsuffix Exp</StartArguments>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Common\WpfUtils.cs" />
     <Compile Include="Features\Caret\GazeCaret.cs" />
     <Compile Include="Features\Scroll\GazeScroll.cs" />
     <Compile Include="Common\KeyboardListener.cs" />
