@@ -8,8 +8,8 @@ Extension for Visual Studio using eye tracking
 
 ## Features
  
- - [x] Basic scrolling (while holding down a keyboard key)
- - [x] Basic way of moving the caret to where you look
+ - [x] Basic scrolling (while holding down a keyboard key. Currently Right-Ctrl, but it might change)
+ - [x] Basic way of moving the caret to where you look (Currently by tapping Right-Shift, but it will change)
  - [ ] Improve handling of keyboard events to detect double tap, and double tap and hold
  - [ ] Publish preview releases to wsixgallery.com
  - [ ] Update texts in the vsix manifest
