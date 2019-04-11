@@ -13,6 +13,7 @@ Extension for Visual Studio using eye tracking
  - [ ] Improve handling of keyboard events to detect double tap, and double tap and hold
  - [ ] Publish preview releases to wsixgallery.com
  - [ ] Update texts in the vsix manifest
+ - [ ] SOme kind of error reporting in UI and maybe upload to remote service
  - [ ] Add configuration UI
     - [ ] Select what keyboard keys to use
     - [ ] Enabe/disable individual features
