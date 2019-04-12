@@ -1,11 +1,6 @@
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.4.0
 #tool nuget:?package=vswhere&version=2.6.7
-
-#reference "System.IO.Compression"
-#reference "System.IO.Compression.FileSystem"
-#reference "System.IO.Compression.ZipFile"
-
-using System.IO.Compression;
+#tool nuget:?package=GitVersion.CommandLine&version=4.0.0
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -24,6 +19,12 @@ var buildDir = outputDir + Directory("build");
 var publishDir = outputDir + Directory("publish");
 var solution = File("./vs-eye-tracking.sln");
 
+var version = GitVersion();
+
+Information($"Version: {version.SemVer}");
+Information($"Git branch: {version.BranchName}");
+Information($"Build provider: {BuildSystem.Provider}");
+
 //////////////////////////////////////////////////////////////////////
 // TASKS
 //////////////////////////////////////////////////////////////////////
@@ -37,14 +38,12 @@ Task("Clean")
 });
 
 Task("Restore")
-    .IsDependentOn("Clean")
     .Does(() =>
 {
     NuGetRestore(solution);
 });
 
 Task("Build")
-    .IsDependentOn("Restore")
     .Does(() =>
 {
     if(IsRunningOnWindows())
@@ -73,36 +72,20 @@ Task("Build")
     }
 });
 
-Task("PostProcess")
-    .IsDependentOn("Build")
-    .Does(() =>
-{
-    // NOTE: if the csproj hack works, then this will not be needed
-    
-    // add native dlls to vsix package
-    // using (var zipArchive = ZipFile.Open(buildDir + File("EyeTrackingVsix.vsix"), ZipArchiveMode.Update))
-    // {
-    //     zipArchive.CreateEntryFromFile(
-    //         buildDir + File("tobii_stream_engine.dll"),
-    //         "tobii_stream_engine.dll");
-    // }
-
-});
-
 Task("Publish")
-    .IsDependentOn("PostProcess")
     .Does(() =>
 {
     MoveFiles($"{buildDir}/*.vsix", publishDir);
 });
 
 Task("UploadToVsixGallery")
+    .WithCriteria(() => version.BranchName == "master" && !BuildSystem.IsLocalBuild && !BuildSystem.IsPullRequest)
     .Does(() =>
 {
     var file = GetFiles($"{publishDir}/*.vsix").First();
-    var repoUrl = "";
+    var repoUrl = "https://github.com/dansav/vs-eye-tracking";
     var repo = System.Web.HttpUtility.UrlEncode(repoUrl);
-    var issueTrackerUrl = "";
+    var issueTrackerUrl = $"{repoUrl}/issues";
     var issueTracker = System.Web.HttpUtility.UrlEncode(issueTrackerUrl);
     UploadFile($"http://vsixgallery.com/api/upload?repo={repo}&issuetracker={issueTracker}", file);
 });
@@ -113,6 +96,9 @@ Task("UploadToVsixGallery")
 //////////////////////////////////////////////////////////////////////
 
 Task("Default")
+    .IsDependentOn("Clean")
+    .IsDependentOn("Restore")
+    .IsDependentOn("Build")
     .IsDependentOn("Publish");
 
 //////////////////////////////////////////////////////////////////////
