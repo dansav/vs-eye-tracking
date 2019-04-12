@@ -2,6 +2,7 @@
 #tool nuget:?package=vswhere&version=2.6.7
 #tool nuget:?package=GitVersion.CommandLine&version=4.0.0
 
+
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
@@ -9,11 +10,13 @@
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 
+
 //////////////////////////////////////////////////////////////////////
 // PREPARATION
 //////////////////////////////////////////////////////////////////////
 
 // Define directories.
+var sourceDir = Directory("./source");
 var outputDir = Directory("./output");
 var buildDir = outputDir + Directory("build");
 var publishDir = outputDir + Directory("publish");
@@ -24,6 +27,7 @@ var version = GitVersion();
 Information($"Version: {version.SemVer}");
 Information($"Git branch: {version.BranchName}");
 Information($"Build provider: {BuildSystem.Provider}");
+
 
 //////////////////////////////////////////////////////////////////////
 // TASKS
@@ -43,11 +47,30 @@ Task("Restore")
     NuGetRestore(solution);
 });
 
+Task("UpdateVersionNumbers")
+    .Does(() =>
+{
+    CreateAssemblyInfo(outputDir + File("AssemblyVersion.generated.cs"), new AssemblyInfoSettings {
+        Version = version.MajorMinorPatch,
+        FileVersion = version.MajorMinorPatch,
+        InformationalVersion = version.InformationalVersion,
+    });
+
+    XmlPoke(
+        sourceDir + File("EyeTrackingVsix/source.extension.vsixmanifest"),
+        "/ns:PackageManifest/ns:Metadata/ns:Identity/@Version",
+        version.MajorMinorPatch, new XmlPokeSettings
+        {
+            Namespaces = new Dictionary<string, string>
+            {
+                { "ns", "http://schemas.microsoft.com/developer/vsx-schema/2011" }
+            }
+        });
+});
+
 Task("Build")
     .Does(() =>
 {
-    if(IsRunningOnWindows())
-    {
         var latestInstallationPath = VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild" });
         var msbuildPath = latestInstallationPath.CombineWithFilePath("MSBuild/current/Bin/MSBuild.exe");
 
@@ -60,22 +83,14 @@ Task("Build")
             .WithTarget("Rebuild")
             .WithProperty("OutDir", "../../" + buildDir);
 
-
-        // Use MSBuild
         MSBuild(solution, settings);
-    }
-    else
-    {
-      // Use XBuild
-      XBuild(solution, settings =>
-        settings.SetConfiguration(configuration));
-    }
 });
 
 Task("Publish")
     .Does(() =>
 {
-    MoveFiles($"{buildDir}/*.vsix", publishDir);
+    var fileName = "EyeTrackingVsix";
+    MoveFile($"{buildDir}/{fileName}.vsix", publishDir + File($"{fileName}_{version.SemVer}.vsix"));
 });
 
 Task("UploadToVsixGallery")
@@ -98,6 +113,7 @@ Task("UploadToVsixGallery")
 Task("Default")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
+    .IsDependentOn("UpdateVersionNumbers")
     .IsDependentOn("Build")
     .IsDependentOn("Publish");
 
