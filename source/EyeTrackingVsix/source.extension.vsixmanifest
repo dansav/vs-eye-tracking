@@ -1,12 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="EyeTrackingVsix.65bd244c-48a0-46af-953a-0fb433e5343d" Version="0.0.1" Language="en-US" Publisher="Daniel Sävhammar" />
-        <DisplayName>EyeTrackingVsix</DisplayName>
-        <Description>Empty VSIX Project.</Description>
+        <Identity Id="65bd244c-48a0-46af-953a-0fb433e5343d" Version="0.0.1" Language="en-US" Publisher="Daniel Sävhammar" />
+        <DisplayName>Eye Tracking for Visual Studio</DisplayName>
+        <Description xml:space="preserve">Use eye tracking in Visual Studio to reduce the need for a mouse</Description>
+        <MoreInfo>https://github.com/dansav/vs-eye-tracking</MoreInfo>
+        <License>LICENSE.txt</License>
         <Icon>Resources\logo-eye-code-90.png</Icon>
         <PreviewImage>Resources\logo-eye-code-175.png</PreviewImage>
         <Tags>eyetracking, eye tracking</Tags>
+        <Preview>true</Preview>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[16.0, 17.0)" />
