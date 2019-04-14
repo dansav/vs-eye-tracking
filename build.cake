@@ -1,7 +1,7 @@
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.4.0
 #tool nuget:?package=vswhere&version=2.6.7
 #tool nuget:?package=GitVersion.CommandLine&version=4.0.0
-
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.10.0
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -18,7 +18,6 @@ var configuration = Argument("configuration", "Release");
 // Define directories.
 var sourceDir = Directory("./source");
 var outputDir = Directory("./output");
-var buildDir = outputDir + Directory("build");
 var publishDir = outputDir + Directory("publish");
 var solution = File("./vs-eye-tracking.sln");
 
@@ -37,7 +36,6 @@ Task("Clean")
     .Does(() =>
 {
     CleanDirectory(outputDir);
-    EnsureDirectoryExists(buildDir);
     EnsureDirectoryExists(publishDir);
 });
 
@@ -80,17 +78,30 @@ Task("Build")
             Configuration = configuration,
             PlatformTarget = PlatformTarget.x86,
         }
-            .WithTarget("Rebuild")
-            .WithProperty("OutDir", "../../" + buildDir);
+            .WithTarget("Rebuild");
 
         MSBuild(solution, settings);
+});
+
+Task("Test")
+    .Does(() =>
+{
+   NUnit3("./source/**/bin/Release/*.Tests.dll", new NUnit3Settings
+   {
+       X86 = true,
+   });
 });
 
 Task("Publish")
     .Does(() =>
 {
-    var fileName = "EyeTrackingVsix";
-    MoveFile($"{buildDir}/{fileName}.vsix", publishDir + File($"{fileName}_{version.SemVer}.vsix"));
+    var baseFileName = "EyeTrackingVsix";
+
+    var sourcePath = $"{sourceDir}/EyeTrackingVsix/bin/x86/{configuration}/{baseFileName}.vsix";
+    var targetPath = publishDir + File($"{baseFileName}_{version.SemVer}.vsix");
+
+    Information($"Moving vsix to: {targetPath}");
+    MoveFile(sourcePath, targetPath);
 });
 
 Task("UploadToVsixGallery")
@@ -102,7 +113,10 @@ Task("UploadToVsixGallery")
     var repo = System.Web.HttpUtility.UrlEncode(repoUrl);
     var issueTrackerUrl = $"{repoUrl}/issues";
     var issueTracker = System.Web.HttpUtility.UrlEncode(issueTrackerUrl);
+
+    Information("Uploading vsix to vsixgallery.com...");
     UploadFile($"http://vsixgallery.com/api/upload?repo={repo}&issuetracker={issueTracker}", file);
+    Information("Done!");
 });
 
 
@@ -115,7 +129,9 @@ Task("Default")
     .IsDependentOn("Restore")
     .IsDependentOn("UpdateVersionNumbers")
     .IsDependentOn("Build")
-    .IsDependentOn("Publish");
+    .IsDependentOn("Test")
+    .IsDependentOn("Publish")
+    .IsDependentOn("UploadToVsixGallery");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
