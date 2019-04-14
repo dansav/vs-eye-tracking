@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{A0A09251-8
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EyeTrackingVsix.Tests", "source\EyeTrackingVsix.Tests\EyeTrackingVsix.Tests.csproj", "{05B31A43-812E-4424-89BF-CF0070C0826E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,14 @@ Global
 		{7EC91B03-C796-4303-8D40-AEACF1516670}.Release|Any CPU.ActiveCfg = Release|x86
 		{7EC91B03-C796-4303-8D40-AEACF1516670}.Release|x86.ActiveCfg = Release|x86
 		{7EC91B03-C796-4303-8D40-AEACF1516670}.Release|x86.Build.0 = Release|x86
+		{05B31A43-812E-4424-89BF-CF0070C0826E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05B31A43-812E-4424-89BF-CF0070C0826E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05B31A43-812E-4424-89BF-CF0070C0826E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{05B31A43-812E-4424-89BF-CF0070C0826E}.Debug|x86.Build.0 = Debug|Any CPU
+		{05B31A43-812E-4424-89BF-CF0070C0826E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05B31A43-812E-4424-89BF-CF0070C0826E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05B31A43-812E-4424-89BF-CF0070C0826E}.Release|x86.ActiveCfg = Release|Any CPU
+		{05B31A43-812E-4424-89BF-CF0070C0826E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

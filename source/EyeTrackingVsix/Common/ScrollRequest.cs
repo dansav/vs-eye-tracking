@@ -1,6 +1,6 @@
 ﻿namespace EyeTrackingVsix.Common
 {
-    internal enum ScrollRequest
+    public enum ScrollRequest
     {
         Stop,
         Start,

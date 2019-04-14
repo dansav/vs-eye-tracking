@@ -1,6 +1,7 @@
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.4.0
 #tool nuget:?package=vswhere&version=2.6.7
 #tool nuget:?package=GitVersion.CommandLine&version=4.0.0
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.10.0
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -9,13 +10,14 @@
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 
+
 //////////////////////////////////////////////////////////////////////
 // PREPARATION
 //////////////////////////////////////////////////////////////////////
 
 // Define directories.
+var sourceDir = Directory("./source");
 var outputDir = Directory("./output");
-var buildDir = outputDir + Directory("build");
 var publishDir = outputDir + Directory("publish");
 var solution = File("./vs-eye-tracking.sln");
 
@@ -25,6 +27,7 @@ Information($"Version: {version.SemVer}");
 Information($"Git branch: {version.BranchName}");
 Information($"Build provider: {BuildSystem.Provider}");
 
+
 //////////////////////////////////////////////////////////////////////
 // TASKS
 //////////////////////////////////////////////////////////////////////
@@ -33,7 +36,6 @@ Task("Clean")
     .Does(() =>
 {
     CleanDirectory(outputDir);
-    EnsureDirectoryExists(buildDir);
     EnsureDirectoryExists(publishDir);
 });
 
@@ -43,11 +45,30 @@ Task("Restore")
     NuGetRestore(solution);
 });
 
+Task("UpdateVersionNumbers")
+    .Does(() =>
+{
+    CreateAssemblyInfo(outputDir + File("AssemblyVersion.generated.cs"), new AssemblyInfoSettings {
+        Version = version.MajorMinorPatch,
+        FileVersion = version.MajorMinorPatch,
+        InformationalVersion = version.InformationalVersion,
+    });
+
+    XmlPoke(
+        sourceDir + File("EyeTrackingVsix/source.extension.vsixmanifest"),
+        "/ns:PackageManifest/ns:Metadata/ns:Identity/@Version",
+        version.MajorMinorPatch, new XmlPokeSettings
+        {
+            Namespaces = new Dictionary<string, string>
+            {
+                { "ns", "http://schemas.microsoft.com/developer/vsx-schema/2011" }
+            }
+        });
+});
+
 Task("Build")
     .Does(() =>
 {
-    if(IsRunningOnWindows())
-    {
         var latestInstallationPath = VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild" });
         var msbuildPath = latestInstallationPath.CombineWithFilePath("MSBuild/current/Bin/MSBuild.exe");
 
@@ -57,25 +78,30 @@ Task("Build")
             Configuration = configuration,
             PlatformTarget = PlatformTarget.x86,
         }
-            .WithTarget("Rebuild")
-            .WithProperty("OutDir", "../../" + buildDir);
+            .WithTarget("Rebuild");
 
-
-        // Use MSBuild
         MSBuild(solution, settings);
-    }
-    else
-    {
-      // Use XBuild
-      XBuild(solution, settings =>
-        settings.SetConfiguration(configuration));
-    }
+});
+
+Task("Test")
+    .Does(() =>
+{
+   NUnit3("./source/**/bin/Release/*.Tests.dll", new NUnit3Settings
+   {
+       X86 = true,
+   });
 });
 
 Task("Publish")
     .Does(() =>
 {
-    MoveFiles($"{buildDir}/*.vsix", publishDir);
+    var baseFileName = "EyeTrackingVsix";
+
+    var sourcePath = $"{sourceDir}/EyeTrackingVsix/bin/x86/{configuration}/{baseFileName}.vsix";
+    var targetPath = publishDir + File($"{baseFileName}_{version.SemVer}.vsix");
+
+    Information($"Moving vsix to: {targetPath}");
+    MoveFile(sourcePath, targetPath);
 });
 
 Task("UploadToVsixGallery")
@@ -87,7 +113,10 @@ Task("UploadToVsixGallery")
     var repo = System.Web.HttpUtility.UrlEncode(repoUrl);
     var issueTrackerUrl = $"{repoUrl}/issues";
     var issueTracker = System.Web.HttpUtility.UrlEncode(issueTrackerUrl);
+
+    Information("Uploading vsix to vsixgallery.com...");
     UploadFile($"http://vsixgallery.com/api/upload?repo={repo}&issuetracker={issueTracker}", file);
+    Information("Done!");
 });
 
 
@@ -98,8 +127,11 @@ Task("UploadToVsixGallery")
 Task("Default")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
+    .IsDependentOn("UpdateVersionNumbers")
     .IsDependentOn("Build")
-    .IsDependentOn("Publish");
+    .IsDependentOn("Test")
+    .IsDependentOn("Publish")
+    .IsDependentOn("UploadToVsixGallery");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
