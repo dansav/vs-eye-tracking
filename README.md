@@ -1,4 +1,4 @@
-![Logo](source/EyeTrackingVsix/Resources/logo-eye-code-175.png)
+![Logo](source/EyeTrackingVsix/Resources/logo-eye-code-90.png)
 
 # Eye Tracking for Visual Studio
 
