@@ -112,7 +112,7 @@ Task("Publish")
 });
 
 Task("UploadToVsixGallery")
-    //.WithCriteria(() => version.BranchName == "master" && !BuildSystem.IsLocalBuild && !BuildSystem.IsPullRequest)
+    .WithCriteria(() => version.BranchName == "master" && !BuildSystem.IsLocalBuild && !BuildSystem.IsPullRequest)
     .Does(() =>
 {
     var file = GetFiles($"{publishDir}/*.vsix").First();
