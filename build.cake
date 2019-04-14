@@ -89,6 +89,13 @@ Task("Test")
    NUnit3("./source/**/bin/Release/*.Tests.dll", new NUnit3Settings
    {
        X86 = true,
+       Results = new[]
+       {
+            new NUnit3Result
+            {
+               FileName = outputDir + File("TestResult.xml")
+            }
+        },  
    });
 });
 
@@ -105,17 +112,26 @@ Task("Publish")
 });
 
 Task("UploadToVsixGallery")
-    .WithCriteria(() => version.BranchName == "master" && !BuildSystem.IsLocalBuild && !BuildSystem.IsPullRequest)
+    //.WithCriteria(() => version.BranchName == "master" && !BuildSystem.IsLocalBuild && !BuildSystem.IsPullRequest)
     .Does(() =>
 {
     var file = GetFiles($"{publishDir}/*.vsix").First();
-    var repoUrl = "https://github.com/dansav/vs-eye-tracking";
+    Information($"Found file to upload: {file}");
+
+    var repoUrl = "https://github.com/dansav/vs-eye-tracking/";
     var repo = System.Web.HttpUtility.UrlEncode(repoUrl);
-    var issueTrackerUrl = $"{repoUrl}/issues";
+    var issueTrackerUrl = $"{repoUrl}issues/";
     var issueTracker = System.Web.HttpUtility.UrlEncode(issueTrackerUrl);
 
-    Information("Uploading vsix to vsixgallery.com...");
-    UploadFile($"http://vsixgallery.com/api/upload?repo={repo}&issuetracker={issueTracker}", file);
+    var uploadUrl = $"http://vsixgallery.com/api/upload?repo={repo}&issuetracker={issueTracker}";
+    Information("Uploading vsix...");
+    Information($"Url: {uploadUrl}");
+
+    var client = new System.Net.Http.HttpClient();
+    var fileContent = new System.Net.Http.ByteArrayContent(System.IO.File.ReadAllBytes(file.ToString()));
+    var response = client.PostAsync(uploadUrl, fileContent).Result;
+    Information(response.Content.ReadAsStringAsync().Result);
+
     Information("Done!");
 });
 
