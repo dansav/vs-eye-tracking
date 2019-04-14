@@ -7,20 +7,20 @@ using System.Windows.Media;
 
 namespace EyeTrackingVsix.Features.Scroll
 {
-    internal class GazeScroll
+    public class GazeScroll
     {
         private readonly IWpfTextView _textView;
-        private readonly KeyboardListener _keyboard;
-        private readonly IEyetracker _gaze;
+        private readonly KeyboardEventAggregator _keyboard;
+        private readonly IEyetracker _eyetracker;
         private DateTime _timestamp;
         private bool _scroll;
         private double _direction;
 
-        public GazeScroll(IWpfTextView textView, KeyboardListener keyboard, IEyetracker eyetracker)
+        public GazeScroll(IWpfTextView textView, KeyboardEventAggregator keyboard, IEyetracker eyetracker)
         {
             _textView = textView;
             _keyboard = keyboard;
-            _gaze = eyetracker;
+            _eyetracker = eyetracker;
 
             _textView.Closed += OnTextViewClosed;
             _keyboard.UpdateScroll += OnUpdateScroll;
@@ -56,16 +56,21 @@ namespace EyeTrackingVsix.Features.Scroll
         {
             if (_scroll) return;
 
+            _direction = 0;
+
+            var elm = _textView.VisualElement;
+            if (!_eyetracker.IsLookingAt(elm)) return;
+
             _timestamp = DateTime.Now;
             _scroll = true;
-            _direction = GetScrollDirection();
+            _direction = GetScrollDirection(elm);
 
             CompositionTarget.Rendering += OnCompositionTargetRendering;
         }
 
         private void OnCompositionTargetRendering(object sender, EventArgs e)
         {
-            const double scrollVelocityPixelsPerSecond = 300;
+            const double scrollVelocityPixelsPerSecond = 400;
 
             if (!_scroll) return;
 
@@ -79,25 +84,11 @@ namespace EyeTrackingVsix.Features.Scroll
             }
         }
 
-        private double GetScrollDirection()
+        private double GetScrollDirection(FrameworkElement elm)
         {
-            var w = System.Windows.Forms.Screen.PrimaryScreen;
-            var gx = _gaze.X * w.WorkingArea.Width;
-            var gy = _gaze.Y * w.WorkingArea.Height;
-
-            var elm = _textView.VisualElement;
-            var elmTopLeftScreen = elm.PointToScreen(new Point(0, 0));
-            var elmBottomRightScreen = elm.PointToScreen(new Point(elm.ActualWidth, elm.ActualHeight));
-
-            if (gx > elmTopLeftScreen.X && gx < elmBottomRightScreen.X)
-            {
-                if (gy > elmTopLeftScreen.Y && gy < elmBottomRightScreen.Y)
-                {
-                    var center = elmTopLeftScreen.Y + (elmBottomRightScreen.Y - elmTopLeftScreen.Y) / 2;
-                    return Math.Sign(center - gy);
-                }
-            }
-            return 0;
+            var gazePoint = elm.GetRelativeGazePoint(_eyetracker);
+            var center = elm.ActualHeight / 2;
+            return Math.Sign(center - gazePoint.Y);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace EyeTrackingVsix
     [Export(typeof(IWpfTextViewCreationListener))]
     [ContentType("text")]
     [TextViewRole(PredefinedTextViewRoles.Document)]
-    internal sealed class WpfTextViewListener : IWpfTextViewCreationListener
+    public sealed class WpfTextViewListener : IWpfTextViewCreationListener
     {
         /// <summary>
         /// Set up keyboard and eye tracking handling related to text editor
@@ -23,7 +23,7 @@ namespace EyeTrackingVsix
         /// <param name="textView">The <see cref="IWpfTextView"/> used to calculate gaze point</param>
         public void TextViewCreated(IWpfTextView textView)
         {
-            var keyboard = new KeyboardListener(textView);
+            var keyboard = new KeyboardEventAggregator(textView, new HardcodedKeyboardSettings());
             var eyetracker = Eyetracker.Desktop;
             new GazeScroll(textView, keyboard, eyetracker);
             new GazeCaret(textView, keyboard, eyetracker);
