@@ -4,6 +4,7 @@
  - [ ] Add configuration UI
    - [ ] Select what keyboard keys to use
    - [ ] Enabe/disable individual features
+   - [ ] Change scroll speed and delays
 
 Features that have a checkmark are complete and available for
 download in the
