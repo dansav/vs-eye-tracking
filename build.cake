@@ -42,7 +42,14 @@ Task("Clean")
 Task("Restore")
     .Does(() =>
 {
-    NuGetRestore(solution);
+    // workaround to not pick msbuild from VS2019 Preview
+    var latestInstallationPath = VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild" });
+    var msbuildPath = latestInstallationPath.CombineWithFilePath("MSBuild/current/Bin/MSBuild.exe");
+
+    NuGetRestore(solution, new NuGetRestoreSettings()
+    {
+        MSBuildPath = System.IO.Path.GetDirectoryName(msbuildPath.ToString())
+    });
 });
 
 Task("UpdateVersionNumbers")
