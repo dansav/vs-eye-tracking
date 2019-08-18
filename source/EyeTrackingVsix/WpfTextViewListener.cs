@@ -6,6 +6,7 @@ using EyeTrackingVsix.Features.Scroll;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
+using EyeTrackingVsix.Options;
 using EyeTrackingVsix.Utils;
 
 namespace EyeTrackingVsix
@@ -37,9 +38,20 @@ namespace EyeTrackingVsix
                 return;
             }
 
+            if (!GeneralOptions.Instance.CaretEnabled && !GeneralOptions.Instance.ScrollEnabled)
+                return;
+
             var keyboard = new KeyboardEventAggregator(textView, new HardcodedKeyboardSettings());
-            new GazeScroll(textView, keyboard, eyetracker);
-            new GazeCaret(textView, keyboard, eyetracker);
+
+            if (GeneralOptions.Instance.ScrollEnabled)
+            {
+                new GazeScroll(textView, keyboard, eyetracker);
+            }
+
+            if (GeneralOptions.Instance.CaretEnabled)
+            {
+                new GazeCaret(textView, keyboard, eyetracker);
+            }
         }
     }
 }

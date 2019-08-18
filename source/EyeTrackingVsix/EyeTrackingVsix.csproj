@@ -50,7 +50,7 @@
       <Link>Properties\AssemblyVersion.generated.cs</Link>
     </Compile>
     <Compile Include="Common\DateTimeClock.cs" />
-    <Compile Include="Common\Keyboard\HardcodedKeyboardSettings.cs" />
+    <Compile Include="Common\Keyboard\KeyboardSettings.cs" />
     <Compile Include="Common\Configuration\IKeyboardSettings.cs" />
     <Compile Include="Common\IMeassureTime.cs" />
     <Compile Include="Common\Keyboard\KeyboardEventAggregator.cs" />
@@ -59,6 +59,12 @@
     <Compile Include="Common\WpfUtils.cs" />
     <Compile Include="Features\Caret\GazeCaret.cs" />
     <Compile Include="Features\Scroll\GazeScroll.cs" />
+    <Compile Include="Options\DialogPageProvider.cs" />
+    <Compile Include="Options\GeneralOptions.cs" />
+    <Compile Include="Options\OptionModelBase.cs" />
+    <Compile Include="Options\OptionPageBase.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EyeTrackingVsixPackage.cs" />
     <Compile Include="Common\ScrollRequest.cs" />

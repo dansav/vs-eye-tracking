@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using EyeTrackingVsix.Options;
 using EyeTrackingVsix.Utils;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -27,6 +28,7 @@ namespace EyeTrackingVsix
     /// </remarks>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideAutoLoad(VSConstants.UICONTEXT.ShellInitialized_string, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideOptionPage(typeof(DialogPageProvider.General), "Eye tracking", "General", 0, 0, true)]
     [Guid(PackageGuidString)]
     public sealed class EyeTrackingVsixPackage : AsyncPackage
     {
