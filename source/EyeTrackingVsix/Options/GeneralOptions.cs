@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using EyeTrackingVsix.Common.Keyboard;
 
 namespace EyeTrackingVsix.Options
 {
@@ -30,6 +31,12 @@ namespace EyeTrackingVsix.Options
         [DefaultValue(true)]
         public bool CaretEnabled { get; set; } = true;
 
+        [Category("Caret")]
+        [DisplayName("Keyboard key")]
+        [Description("Select the key on the keyboard that will be used to trigger the caret jump.")]
+        [DefaultValue(InteractionKey.RightCtrl)]
+        public InteractionKey CaretKey { get; set; } = InteractionKey.RightCtrl;
+
         // --------------------------------------------------------------------
 
         [Category("Scroll")]
@@ -37,5 +44,11 @@ namespace EyeTrackingVsix.Options
         [Description("Enable or disable the scroll feature")]
         [DefaultValue(true)]
         public bool ScrollEnabled { get; set; } = true;
+
+        [Category("Scroll")]
+        [DisplayName("Keyboard key")]
+        [Description("Select the key on the keyboard that will be used to trigger a scroll.")]
+        [DefaultValue(InteractionKey.RightCtrl)]
+        public InteractionKey ScrollKey { get; set; } = InteractionKey.RightCtrl;
     }
 }

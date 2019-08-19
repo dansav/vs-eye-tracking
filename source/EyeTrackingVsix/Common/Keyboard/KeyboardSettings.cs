@@ -1,4 +1,6 @@
-﻿using System.Windows.Input;
+﻿using System.Collections.Generic;
+using System.Windows.Input;
+using EyeTrackingVsix.Common.Keyboard;
 using EyeTrackingVsix.Options;
 
 namespace EyeTrackingVsix.Common
@@ -8,23 +10,30 @@ namespace EyeTrackingVsix.Common
     /// </summary>
     public class KeyboardSettings : IKeyboardSettings
     {
+        private static readonly IReadOnlyDictionary<InteractionKey, Key> _lookup = new Dictionary<InteractionKey, Key>
+        {
+            { InteractionKey.LeftShift, Key.LeftShift },
+            { InteractionKey.LeftCtrl, Key.LeftCtrl },
+            { InteractionKey.RightShift, Key.RightShift },
+            { InteractionKey.RightCtrl, Key.RightCtrl },
+        };
+
+        private readonly GeneralOptions _options;
+
         internal KeyboardSettings(GeneralOptions options)
         {
-            // settings are constant during the lifetime of a document window
-            DoubleTapReleaseTimeMs = options.KeyTapReleaseTimeMs;
-            DoubleTapIntervalTimeMs = options.DoubleTapIntervalTimeMs;
-            DoubleTapHoldTimeMs = options.KeyTapHoldTimeMs;
+            _options = options;
         }
 
-        public Key MoveCaretKey => Key.RightCtrl;
+        public Key MoveCaretKey => _lookup[_options.CaretKey];
 
-        public Key ScrollKey => Key.RightCtrl;
+        public Key ScrollKey => _lookup[_options.ScrollKey];
 
-        public int DoubleTapReleaseTimeMs { get; }
+        public int DoubleTapReleaseTimeMs => _options.KeyTapReleaseTimeMs;
 
-        public int DoubleTapIntervalTimeMs { get; }
+        public int DoubleTapIntervalTimeMs => _options.DoubleTapIntervalTimeMs;
 
-        public int DoubleTapHoldTimeMs { get; }
+        public int DoubleTapHoldTimeMs => _options.KeyTapHoldTimeMs;
     }
 
     public class HardcodedKeyboardSettings : IKeyboardSettings

@@ -61,6 +61,7 @@
     <Compile Include="Features\Scroll\GazeScroll.cs" />
     <Compile Include="Options\DialogPageProvider.cs" />
     <Compile Include="Options\GeneralOptions.cs" />
+    <Compile Include="Common\Keyboard\InteractionKey.cs" />
     <Compile Include="Options\OptionModelBase.cs" />
     <Compile Include="Options\OptionPageBase.cs">
       <SubType>Component</SubType>

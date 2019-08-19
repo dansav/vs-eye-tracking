@@ -41,7 +41,7 @@ namespace EyeTrackingVsix
             if (!GeneralOptions.Instance.CaretEnabled && !GeneralOptions.Instance.ScrollEnabled)
                 return;
 
-            var keyboard = new KeyboardEventAggregator(textView, new HardcodedKeyboardSettings());
+            var keyboard = new KeyboardEventAggregator(textView, new KeyboardSettings(GeneralOptions.Instance));
 
             if (GeneralOptions.Instance.ScrollEnabled)
             {
