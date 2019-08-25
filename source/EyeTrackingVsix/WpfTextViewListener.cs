@@ -1,10 +1,13 @@
-﻿using Eyetracking.NET;
+﻿using System;
+using Eyetracking.NET;
 using EyeTrackingVsix.Common;
 using EyeTrackingVsix.Features.MoveCarret;
 using EyeTrackingVsix.Features.Scroll;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using System.ComponentModel.Composition;
+using EyeTrackingVsix.Options;
+using EyeTrackingVsix.Utils;
 
 namespace EyeTrackingVsix
 {
@@ -23,10 +26,32 @@ namespace EyeTrackingVsix
         /// <param name="textView">The <see cref="IWpfTextView"/> used to calculate gaze point</param>
         public void TextViewCreated(IWpfTextView textView)
         {
-            var keyboard = new KeyboardEventAggregator(textView, new HardcodedKeyboardSettings());
-            var eyetracker = Eyetracker.Desktop;
-            new GazeScroll(textView, keyboard, eyetracker);
-            new GazeCaret(textView, keyboard, eyetracker);
+            IEyetracker eyetracker;
+            try
+            {
+                eyetracker = Eyetracker.Desktop;
+            }
+            catch (Exception e)
+            {
+                Logger.Log("Could not connect to eye tracker (see exception below). All features are disabled.");
+                Logger.Log(e);
+                return;
+            }
+
+            if (!GeneralOptions.Instance.CaretEnabled && !GeneralOptions.Instance.ScrollEnabled)
+                return;
+
+            var keyboard = new KeyboardEventAggregator(textView, new KeyboardSettings(GeneralOptions.Instance));
+
+            if (GeneralOptions.Instance.ScrollEnabled)
+            {
+                new GazeScroll(textView, keyboard, eyetracker);
+            }
+
+            if (GeneralOptions.Instance.CaretEnabled)
+            {
+                new GazeCaret(textView, keyboard, eyetracker);
+            }
         }
     }
 }

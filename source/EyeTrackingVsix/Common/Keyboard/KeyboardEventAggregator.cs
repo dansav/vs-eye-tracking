@@ -8,23 +8,47 @@ namespace EyeTrackingVsix.Common
     public class KeyboardEventAggregator
     {
         private readonly IWpfTextView _textView;
-        private readonly KeyboardSequenceDetector[] _detectors;
+        private readonly IKeyboardSettings _settings;
+
+        private KeyboardSequenceDetector[] _detectors;
 
         private ScrollRequest _scrollState;
 
         public KeyboardEventAggregator(IWpfTextView textView, IKeyboardSettings settings)
         {
+            _settings = settings;
             _textView = textView;
+
+            Rebuild(this, EventArgs.Empty);
+
+            _textView.GotAggregateFocus += Rebuild;
+            _textView.Closed += OnTextViewClosed;
+            _textView.VisualElement.Loaded += VisualElementOnLoaded;
+            _textView.VisualElement.Unloaded += VisualElementOnUnloaded;
+        }
+
+        public event Action<ScrollRequest> UpdateScroll;
+
+        public event Action MoveCaret;
+
+        private void Rebuild(object sender, EventArgs args)
+        {
+            //string docName = "UNKNOWN";
+            //if (_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out var textDoc))
+            //{
+            //    docName = System.IO.Path.GetFileName(textDoc.FilePath);
+            //}
+            //Logger.Log($"Rebuilding keyboard handler for {docName}");
 
             var moveCaret = new KeyboardSequenceDetector(
                 new DateTimeClock(),
                 () => MoveCaret?.Invoke(),
                 new[]
                 {
-                    new KeyFrame(settings.MoveCaretKey, true, 0),
-                    new KeyFrame(settings.MoveCaretKey, false, settings.DoubleTapReleaseTimeMs),
-                    new KeyFrame(settings.MoveCaretKey, true, settings.DoubleTapIntervalTimeMs),
-                    new KeyFrame(settings.MoveCaretKey, false, settings.DoubleTapReleaseTimeMs),
+                    new KeyFrame(_settings.MoveCaretKey, true, 0),
+                    new KeyFrame(_settings.MoveCaretKey, false, _settings.DoubleTapReleaseTimeMs),
+                    new KeyFrame(_settings.MoveCaretKey, true, _settings.DoubleTapIntervalTimeMs),
+                    new KeyFrame(_settings.MoveCaretKey, false, _settings.DoubleTapReleaseTimeMs),
                 });
 
             var startScroll = new KeyboardSequenceDetector(
@@ -39,10 +63,10 @@ namespace EyeTrackingVsix.Common
                 },
                 new[]
                 {
-                    new KeyFrame(settings.ScrollKey, true, 0),
-                    new KeyFrame(settings.ScrollKey, false, settings.DoubleTapReleaseTimeMs),
-                    new KeyFrame(settings.ScrollKey, true, settings.DoubleTapIntervalTimeMs),
-                    new KeyFrame(settings.ScrollKey, true, settings.DoubleTapHoldTimeMs),
+                    new KeyFrame(_settings.ScrollKey, true, 0),
+                    new KeyFrame(_settings.ScrollKey, false, _settings.DoubleTapReleaseTimeMs),
+                    new KeyFrame(_settings.ScrollKey, true, _settings.DoubleTapIntervalTimeMs),
+                    new KeyFrame(_settings.ScrollKey, true, _settings.DoubleTapHoldTimeMs),
                 });
 
             var stopScroll = new KeyboardSequenceDetector(
@@ -57,7 +81,7 @@ namespace EyeTrackingVsix.Common
                 },
                 new[]
                 {
-                    new KeyFrame(settings.ScrollKey, false, 0),
+                    new KeyFrame(_settings.ScrollKey, false, 0),
                 });
 
             _detectors = new[]
@@ -66,15 +90,7 @@ namespace EyeTrackingVsix.Common
                 startScroll,
                 stopScroll
             };
-
-            _textView.Closed += OnTextViewClosed;
-            _textView.VisualElement.Loaded += VisualElementOnLoaded;
-            _textView.VisualElement.Unloaded += VisualElementOnUnloaded;
         }
-
-        public event Action<ScrollRequest> UpdateScroll;
-
-        public event Action MoveCaret;
 
         private void OnTextViewClosed(object sender, EventArgs e)
         {
@@ -99,7 +115,8 @@ namespace EyeTrackingVsix.Common
 
         private void VisualElementOnPreviewKeyUp(object sender, KeyEventArgs e)
         {
-            foreach (var detector in _detectors)
+            var detectors = _detectors;
+            foreach (var detector in detectors)
             {
                 detector.Update(e.Key, e.IsDown);
             }
@@ -107,7 +124,8 @@ namespace EyeTrackingVsix.Common
 
         private void VisualElementOnPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            foreach (var detector in _detectors)
+            var detectors = _detectors;
+            foreach (var detector in detectors)
             {
                 detector.Update(e.Key, e.IsDown);
             }
