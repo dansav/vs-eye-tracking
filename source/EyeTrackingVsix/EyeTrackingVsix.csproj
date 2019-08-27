@@ -49,9 +49,10 @@
     <Compile Include="..\..\output\AssemblyVersion.generated.cs">
       <Link>Properties\AssemblyVersion.generated.cs</Link>
     </Compile>
+    <Compile Include="Features\Scroll\IScrollSettings.cs" />
     <Compile Include="Common\DateTimeClock.cs" />
     <Compile Include="Common\Keyboard\KeyboardSettings.cs" />
-    <Compile Include="Common\Configuration\IKeyboardSettings.cs" />
+    <Compile Include="Common\Keyboard\IKeyboardSettings.cs" />
     <Compile Include="Common\IMeassureTime.cs" />
     <Compile Include="Common\Keyboard\KeyboardEventAggregator.cs" />
     <Compile Include="Common\Keyboard\KeyboardSequenceDetector.cs" />
