@@ -45,7 +45,8 @@ namespace EyeTrackingVsix
 
             if (GeneralOptions.Instance.ScrollEnabled)
             {
-                var velocityProvider = new StaticVelocityProvider(new ScrollSettings(GeneralOptions.Instance));
+                //var velocityProvider = new StaticVelocityProvider(new ScrollSettings(GeneralOptions.Instance));
+                var velocityProvider = new LinearVelocityProvider(new ScrollSettings(GeneralOptions.Instance));
                 new GazeScroll(textView, keyboard, eyetracker, velocityProvider);
             }
 
