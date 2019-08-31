@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using EyeTrackingVsix.Common.Keyboard;
+using EyeTrackingVsix.Features.Scroll;
 
 namespace EyeTrackingVsix.Options
 {
@@ -52,9 +53,33 @@ namespace EyeTrackingVsix.Options
         public InteractionKey ScrollKey { get; set; } = InteractionKey.RightCtrl;
 
         [Category("Scroll")]
+        [DisplayName("Scroll type (experimental)")]
+        [Description("Select the type of scroll you prefer. NOTE: Changes to this value only applies to documents opened after the value has changed.")]
+        [DefaultValue(ScrollType.Exponential)]
+        public ScrollType ScrollType { get; set; } = ScrollType.Exponential;
+        
+        [Category("Scroll")]
         [DisplayName("Scroll velocity (pixels per second)")]
         [Description("Select the key on the keyboard that will be used to trigger a scroll.")]
         [DefaultValue(400)]
-        public int ScrollVelocity { get; set; } = 400;
+        public int ScrollVelocity { get; set; } = 800;
+
+        [Category("Scroll")]
+        [DisplayName("Scroll velocity: Linear acceleration time (seconds)")]
+        [Description("The time it takes the linear scroll to reach its max velocity (only applicable if Linear scroll type is selected)")]
+        [DefaultValue(3.0)]
+        public double ScrollLinearAccelerationTime { get; set; } = 1.5;
+
+        [Category("Scroll")]
+        [DisplayName("Scroll velocity: Exponential acceleration power (experimental)")]
+        [Description("A higher number accelerates to max speed faster. Reccomended values: between 0.001 and 0.05. (only applicable if Exponential scroll type is selected)")]
+        [DefaultValue(0.005)]
+        public double ScrollExponentialAccelerationPower { get; set; } = 0.005;
+
+        [Category("Scroll")]
+        [DisplayName("Scroll velocity: Exponential scroll inertia (experimental)")]
+        [Description("A higher number breaks to no scroll faster. Reccomended values: between 0.001 and 0.05. (only applicable if Exponential scroll type is selected)")]
+        [DefaultValue(0.025)]
+        public double ScrollExponentialInertia { get; set; } = 0.025;
     }
 }
