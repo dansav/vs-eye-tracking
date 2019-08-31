@@ -49,9 +49,11 @@
     <Compile Include="..\..\output\AssemblyVersion.generated.cs">
       <Link>Properties\AssemblyVersion.generated.cs</Link>
     </Compile>
+    <Compile Include="Features\Scroll\ExponentialVelocityProvider.cs" />
+    <Compile Include="Features\Scroll\IScrollSettings.cs" />
     <Compile Include="Common\DateTimeClock.cs" />
     <Compile Include="Common\Keyboard\KeyboardSettings.cs" />
-    <Compile Include="Common\Configuration\IKeyboardSettings.cs" />
+    <Compile Include="Common\Keyboard\IKeyboardSettings.cs" />
     <Compile Include="Common\IMeassureTime.cs" />
     <Compile Include="Common\Keyboard\KeyboardEventAggregator.cs" />
     <Compile Include="Common\Keyboard\KeyboardSequenceDetector.cs" />
@@ -59,6 +61,10 @@
     <Compile Include="Common\WpfUtils.cs" />
     <Compile Include="Features\Caret\GazeCaret.cs" />
     <Compile Include="Features\Scroll\GazeScroll.cs" />
+    <Compile Include="Features\Scroll\IVelocityProvider.cs" />
+    <Compile Include="Features\Scroll\LinearVelocityProvider.cs" />
+    <Compile Include="Features\Scroll\ScrollSettings.cs" />
+    <Compile Include="Features\Scroll\StaticVelocityProvider.cs" />
     <Compile Include="Options\DialogPageProvider.cs" />
     <Compile Include="Options\GeneralOptions.cs" />
     <Compile Include="Common\Keyboard\InteractionKey.cs" />
@@ -112,6 +118,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CoroutinesForWpf">
+      <Version>0.1.0-beta0001</Version>
+    </PackageReference>
     <PackageReference Include="Eyetracking.NET">
       <Version>2.0.4</Version>
     </PackageReference>

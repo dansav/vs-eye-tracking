@@ -20,6 +20,7 @@ namespace EyeTrackingVsix
     [TextViewRole(PredefinedTextViewRoles.Document)]
     public sealed class WpfTextViewListener : IWpfTextViewCreationListener
     {
+
         /// <summary>
         /// Set up keyboard and eye tracking handling related to text editor
         /// </summary>
@@ -45,7 +46,10 @@ namespace EyeTrackingVsix
 
             if (GeneralOptions.Instance.ScrollEnabled)
             {
-                new GazeScroll(textView, keyboard, eyetracker);
+                // TODO: make it possible to switch velocity provider in an open document
+                // NOTE: currently each open document will keep its velocity provider until the document is closed
+                var velocityProvider = VelocityProviderFactory.Create(GeneralOptions.Instance.ScrollType);
+                new GazeScroll(textView, keyboard, eyetracker, velocityProvider);
             }
 
             if (GeneralOptions.Instance.CaretEnabled)

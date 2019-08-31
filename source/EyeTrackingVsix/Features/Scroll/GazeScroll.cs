@@ -2,8 +2,9 @@
 using EyeTrackingVsix.Common;
 using Microsoft.VisualStudio.Text.Editor;
 using System;
+using System.Collections;
 using System.Windows;
-using System.Windows.Media;
+using CoroutinesForWpf;
 
 namespace EyeTrackingVsix.Features.Scroll
 {
@@ -12,11 +13,11 @@ namespace EyeTrackingVsix.Features.Scroll
         private readonly IWpfTextView _textView;
         private readonly KeyboardEventAggregator _keyboard;
         private readonly IEyetracker _eyetracker;
-        private DateTime _timestamp;
-        private bool _scroll;
-        private double _direction;
+        private readonly IVelocityProvider _velocityProvider;
 
-        public GazeScroll(IWpfTextView textView, KeyboardEventAggregator keyboard, IEyetracker eyetracker)
+        private DateTime _timestamp;
+
+        public GazeScroll(IWpfTextView textView, KeyboardEventAggregator keyboard, IEyetracker eyetracker, IVelocityProvider velocityProvider)
         {
             _textView = textView;
             _keyboard = keyboard;
@@ -24,10 +25,12 @@ namespace EyeTrackingVsix.Features.Scroll
 
             _textView.Closed += OnTextViewClosed;
             _keyboard.UpdateScroll += OnUpdateScroll;
+            _velocityProvider = velocityProvider;
         }
 
         private void OnTextViewClosed(object sender, EventArgs e)
         {
+            _keyboard.UpdateScroll -= OnUpdateScroll;
             _textView.Closed -= OnTextViewClosed;
         }
 
@@ -46,45 +49,36 @@ namespace EyeTrackingVsix.Features.Scroll
 
         private void StopScroll()
         {
-            if (!_scroll) return;
-
-            CompositionTarget.Rendering -= OnCompositionTargetRendering;
-            _scroll = false;
+            _velocityProvider.Stop();
         }
 
         private void StartScroll()
         {
-            if (_scroll) return;
-
-            _direction = 0;
-
             var elm = _textView.VisualElement;
             if (!_eyetracker.IsLookingAt(elm)) return;
 
-            _timestamp = DateTime.Now;
-            _scroll = true;
-            _direction = GetScrollDirection(elm);
+            Executor.StartCoroutine(DoScroll());
 
-            CompositionTarget.Rendering += OnCompositionTargetRendering;
+            _timestamp = DateTime.Now;
+            var direction = GetScrollDirection(elm);
+            _velocityProvider.Start(direction);
         }
 
-        private void OnCompositionTargetRendering(object sender, EventArgs e)
+        private IEnumerator DoScroll()
         {
-            const double scrollVelocityPixelsPerSecond = 400;
-
-            if (!_scroll) return;
-
-            var elapsed = (DateTime.Now - _timestamp).TotalSeconds;
-            _timestamp = DateTime.Now;
-
-            if (_direction > 0 || _direction < 0)
+            while (_velocityProvider.HasVelocity)
             {
-                var scrollLength = scrollVelocityPixelsPerSecond * elapsed * _direction;
+                var elapsed = (DateTime.Now - _timestamp).TotalSeconds;
+                _timestamp = DateTime.Now;
+
+                var scrollLength = _velocityProvider.Velocity * elapsed;
                 _textView.ViewScroller.ScrollViewportVerticallyByPixels(scrollLength);
+
+                yield return null;
             }
         }
 
-        private double GetScrollDirection(FrameworkElement elm)
+        private int GetScrollDirection(FrameworkElement elm)
         {
             var gazePoint = elm.GetRelativeGazePoint(_eyetracker);
             var center = elm.ActualHeight / 2;
