@@ -14,11 +14,15 @@ download in the
 These are the changes to each version that has been released
 on the official Visual Studio extension gallery.
 
+## 0.3
+ - Fix missing setting for scroll speed
+ - Added more scroll speed profiles and options
+
 ## 0.2
  - Configuration UI (options page)
    - Select what keyboard keys to use (from a subset of available keys)
    - Enabe/disable individual features
-   - Change scroll speed and delays
+   - Change ~~scroll speed~~ and delays
 
 ## 0.1
 - Improve handling of keyboard events to detect double tap, and double tap and hold
