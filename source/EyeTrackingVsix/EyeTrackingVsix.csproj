@@ -49,7 +49,10 @@
     <Compile Include="..\..\output\AssemblyVersion.generated.cs">
       <Link>Properties\AssemblyVersion.generated.cs</Link>
     </Compile>
+    <Compile Include="Features\Scroll\CenterOfElementGazeTransformer.cs" />
+    <Compile Include="Features\Scroll\DynamicVelocityProvider.cs" />
     <Compile Include="Features\Scroll\ExponentialVelocityProvider.cs" />
+    <Compile Include="Features\Scroll\IRelativeGazeTransformer.cs" />
     <Compile Include="Features\Scroll\IScrollSettings.cs" />
     <Compile Include="Common\DateTimeClock.cs" />
     <Compile Include="Common\Keyboard\KeyboardSettings.cs" />

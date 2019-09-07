@@ -6,7 +6,7 @@
 
         double Velocity { get; }
 
-        void Start(int direction);
+        void Start(IRelativeGazeTransformer relativeGaze);
 
         void Stop();
     }

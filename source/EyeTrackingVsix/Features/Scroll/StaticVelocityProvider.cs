@@ -1,4 +1,5 @@
-﻿using EyeTrackingVsix.Common.Configuration;
+﻿using Eyetracking.NET;
+using EyeTrackingVsix.Common.Configuration;
 
 namespace EyeTrackingVsix.Features.Scroll
 {
@@ -15,9 +16,9 @@ namespace EyeTrackingVsix.Features.Scroll
 
         public double Velocity { get; private set; }
         
-        public void Start(int direction)
+        public void Start(IRelativeGazeTransformer relativeGaze)
         {
-            Velocity = direction * _settings.Velocity;
+            Velocity = relativeGaze.Direction.Y * _settings.Velocity;
             HasVelocity = true;
         }
 
