@@ -30,7 +30,7 @@ namespace EyeTrackingVsix
             IEyetracker eyetracker;
             try
             {
-                eyetracker = Eyetracker.Desktop;
+                eyetracker = new Eyetracker();
             }
             catch (Exception e)
             {
