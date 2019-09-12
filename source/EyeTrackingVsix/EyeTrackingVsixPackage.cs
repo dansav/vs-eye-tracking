@@ -1,19 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows;
-using System.Windows.Input;
 using EnvDTE;
-using Eyetracking.NET;
-using EyeTrackingVsix.Common;
 using EyeTrackingVsix.Options;
 using EyeTrackingVsix.Utils;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
-using Window = EnvDTE.Window;
 
 namespace EyeTrackingVsix
 {
@@ -60,129 +53,10 @@ namespace EyeTrackingVsix
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-            var dte = (DTE)(await GetServiceAsync(typeof(DTE)));
-            new FocusableWindowManager(dte.Windows, dte.Events.WindowEvents);
-        }
-    }
-
-    public class FocusableWindowManager
-    {
-        private readonly List<Window> _openWindows;
-        private readonly Eyetracker _eyetracker;
-        private System.Windows.Window _wpfWindow;
-
-        public FocusableWindowManager(Windows windows, WindowEvents events)
-        {
-            _openWindows = new List<Window>();
-            foreach (Window window in windows)
+            if (await GetServiceAsync(typeof(DTE)) is DTE dte)
             {
-                _openWindows.Add(window);
+                new FocusableWindowManager(dte.Windows, dte.Events.WindowEvents);
             }
-            events.WindowCreated += OnWindowCreated;
-            events.WindowClosing += OnWindowClosing;
-            events.WindowActivated += OnWindowActivated;
-            events.WindowMoved += OnWindowMoved;
-
-            Window main = windows.Parent.MainWindow;
-            _wpfWindow = System.Windows.Application.Current.MainWindow;
-
-            var dpiX = 1.25; //main.Width / _wpfWindow.ActualWidth;
-            var dpiY = 1.25; //main.Height / _wpfWindow.ActualHeight;
-
-
-            _wpfWindow.PreviewKeyUp += (sender, args) =>
-            {
-                if (args.Key == Key.LeftCtrl)
-                {
-                    var gazeScreenPoint = ScreenHelpers.GetGazePointInScreenPixels(_eyetracker);
-                    Logger.Log($"Gaze point: {gazeScreenPoint}");
-
-                    bool LookingAtApp = _eyetracker.IsLookingAt(main);
-                    Logger.Log($"Gaze point: {(LookingAtApp ? "" : "not")} looking at VS");
-                    if (!LookingAtApp)
-                    {
-                        return;
-                    }
-
-                    foreach (var openWindow in _openWindows)
-                    {
-                        if (openWindow != main && openWindow.Visible)
-                        {
-                            var winRect = CreateWindowRect(openWindow, dpiX, dpiY);
-                            if (winRect.Contains(gazeScreenPoint))
-                            {
-                                Logger.Log($"You looked at {openWindow.Caption} ({_openWindows.IndexOf(openWindow) + 1})");
-                                openWindow.SetFocus();
-                            }
-                        }
-                    }
-                }
-            };
-
-            _eyetracker = new Eyetracker();
-        }
-
-        private static Rect CreateWindowRect(Window win, double dpiX, double DpiY)
-        {
-            // fix inverted dpi
-            var x = win.Left / dpiX;
-            var y = win.Top / DpiY;
-            var w = win.Width / dpiX;
-            var h = win.Height / DpiY;
-
-            return new Rect(x, y, w, h);
-        }
-
-        private void OnWindowMoved(Window window, int top, int left, int width, int height)
-        {
-            // it appears like this method is always called for new windows
-            if (_openWindows.IndexOf(window) < 0)
-            {
-                _openWindows.Add(window);
-            }
-
-            Logger.Log($"Window was moved: {_openWindows.IndexOf(window) + 1} {window.Visible} top:{top} left:{left} width:{width} height:{height}");
-        }
-
-        private void OnWindowActivated(Window gotfocus, Window lostfocus)
-        {
-            Logger.Log($"Window got focus: {_openWindows.IndexOf(gotfocus)+1}, lost focus: {_openWindows.IndexOf(lostfocus)+1}");
-
-            var kind = gotfocus.Kind;
-
-            if (gotfocus.Object is OutputWindow ow)
-            {
-                var p = ow.ActivePane;
-            }
-
-        }
-
-        private void OnWindowCreated(Window window)
-        {
-            if (_openWindows.IndexOf(window) < 0)
-            {
-                _openWindows.Add(window);
-            }
-            Logger.Log($"Window was created. Total active count: {_openWindows.Count}");
-        }
-
-        private void OnWindowClosing(Window window)
-        {
-            Logger.Log($"Window is closing: {_openWindows.IndexOf(window)+1}");
-            _openWindows.Remove(window);
-        }
-    }
-
-    public static class DteWindow
-    {
-        public static bool IsLookingAt(this IEyetracker eyetracker, EnvDTE.Window window)
-        {
-            var gazePixels = ScreenHelpers.GetGazePointInScreenPixels(eyetracker);
-
-            var x = gazePixels.X - window.Left;
-            var y = gazePixels.Y - window.Top;
-
-            return x > 0 && x < window.Width && y > 0 && y < window.Height;
         }
     }
 }
