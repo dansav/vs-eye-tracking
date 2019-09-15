@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.Shell;
-using System.Windows.Forms;
 
 namespace EyeTrackingVsix.Options
 {

@@ -80,6 +80,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EyeTrackingVsixPackage.cs" />
     <Compile Include="Common\ScrollRequest.cs" />
+    <Compile Include="Services\EyetrackerService.cs" />
+    <Compile Include="Services\KeyboardEventService.cs" />
     <Compile Include="Utils\Logger.cs" />
     <Compile Include="WpfTextViewListener.cs" />
   </ItemGroup>

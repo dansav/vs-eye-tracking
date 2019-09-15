@@ -3,8 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using EnvDTE;
-using Eyetracking.NET;
-using EyeTrackingVsix.Common;
+using EyeTrackingVsix.Services;
 using EyeTrackingVsix.Utils;
 using Microsoft.VisualStudio.Shell;
 using Window = EnvDTE.Window;
@@ -14,9 +13,8 @@ namespace EyeTrackingVsix
     public class FocusableWindowManager
     {
         private readonly List<Window> _openWindows;
-        private readonly Eyetracker _eyetracker;
 
-        public FocusableWindowManager(Windows windows, WindowEvents events)
+        public FocusableWindowManager(Windows windows, WindowEvents events, IEyetrackerService eyetracker, IKeyboardEventService keyboardEventService)
         {
             _openWindows = new List<Window>();
             foreach (Window window in windows)
@@ -35,38 +33,29 @@ namespace EyeTrackingVsix
             var dpiY = scaling.DpiScaleY;
 
             // todo: use the keyboard event aggregator
-            wpfWindow.PreviewKeyUp += (sender, args) =>
+            keyboardEventService.ChangeFocus += () =>
             {
                 ThreadHelper.ThrowIfNotOnUIThread();
 
-                if (args.Key == Key.LeftCtrl)
+                // note: there might be floating windows outside main window bounds
+                var lookingAtApp = eyetracker.IsLookingAt(wpfWindow);
+                Logger.Log($"Gaze point: {(lookingAtApp ? "" : "not")} looking at VS");
+
+                var main = windows.Parent.MainWindow;
+
+                foreach (var openWindow in _openWindows)
                 {
-
-                    var gazeScreenPoint = ScreenHelpers.GetGazePointInScreenPixels(_eyetracker);
-                    Logger.Log($"Gaze point: {gazeScreenPoint}");
-
-                    // note: there might be floating windows outside main window bounds
-                    var lookingAtApp = _eyetracker.IsLookingAt(wpfWindow);
-                    Logger.Log($"Gaze point: {(lookingAtApp ? "" : "not")} looking at VS");
-
-                    var main = windows.Parent.MainWindow;
-
-                    foreach (var openWindow in _openWindows)
+                    if (openWindow != main && openWindow.Visible)
                     {
-                        if (openWindow != main && openWindow.Visible)
+                        var winRect = CreateWindowRect(openWindow, dpiX, dpiY);
+                        if (eyetracker.IsGazeInScreenRegion(winRect))
                         {
-                            var winRect = CreateWindowRect(openWindow, dpiX, dpiY);
-                            if (winRect.Contains(gazeScreenPoint))
-                            {
-                                Logger.Log($"You looked at {openWindow.Caption} ({_openWindows.IndexOf(openWindow) + 1})");
-                                openWindow.SetFocus();
-                            }
+                            Logger.Log($"You looked at {openWindow.Caption} ({_openWindows.IndexOf(openWindow) + 1})");
+                            openWindow.SetFocus();
                         }
                     }
                 }
             };
-
-            _eyetracker = new Eyetracker();
         }
 
         private static Rect CreateWindowRect(Window win, double dpiX, double DpiY)

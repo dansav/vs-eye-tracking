@@ -7,31 +7,27 @@ namespace EyeTrackingVsix.Common
 {
     public class KeyboardEventAggregator
     {
-        private readonly IWpfTextView _textView;
+        private readonly FrameworkElement _element;
         private readonly IKeyboardSettings _settings;
 
         private KeyboardSequenceDetector[] _detectors;
 
         private ScrollRequest _scrollState;
 
-        public KeyboardEventAggregator(IWpfTextView textView, IKeyboardSettings settings)
+        public KeyboardEventAggregator(FrameworkElement element, IKeyboardSettings settings)
         {
+            _element = element;
             _settings = settings;
-            _textView = textView;
 
-            Rebuild(this, EventArgs.Empty);
-
-            _textView.GotAggregateFocus += Rebuild;
-            _textView.Closed += OnTextViewClosed;
-            _textView.VisualElement.Loaded += VisualElementOnLoaded;
-            _textView.VisualElement.Unloaded += VisualElementOnUnloaded;
+            _element.PreviewKeyDown += VisualElementOnPreviewKeyDown;
+            _element.PreviewKeyUp += VisualElementOnPreviewKeyUp;
         }
 
         public event Action<ScrollRequest> UpdateScroll;
 
         public event Action MoveCaret;
 
-        private void Rebuild(object sender, EventArgs args)
+        public void Rebuild()
         {
             //string docName = "UNKNOWN";
             //if (_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out var textDoc))
@@ -90,27 +86,6 @@ namespace EyeTrackingVsix.Common
                 startScroll,
                 stopScroll
             };
-        }
-
-        private void OnTextViewClosed(object sender, EventArgs e)
-        {
-            _textView.Closed -= OnTextViewClosed;
-            _textView.VisualElement.Loaded -= VisualElementOnLoaded;
-            _textView.VisualElement.Unloaded -= VisualElementOnUnloaded;
-            _textView.VisualElement.PreviewKeyDown -= VisualElementOnPreviewKeyDown;
-            _textView.VisualElement.PreviewKeyUp -= VisualElementOnPreviewKeyUp;
-        }
-
-        private void VisualElementOnLoaded(object sender, RoutedEventArgs e)
-        {
-            _textView.VisualElement.PreviewKeyDown += VisualElementOnPreviewKeyDown;
-            _textView.VisualElement.PreviewKeyUp += VisualElementOnPreviewKeyUp;
-        }
-
-        private void VisualElementOnUnloaded(object sender, RoutedEventArgs e)
-        {
-            _textView.VisualElement.PreviewKeyDown -= VisualElementOnPreviewKeyDown;
-            _textView.VisualElement.PreviewKeyUp -= VisualElementOnPreviewKeyUp;
         }
 
         private void VisualElementOnPreviewKeyUp(object sender, KeyEventArgs e)

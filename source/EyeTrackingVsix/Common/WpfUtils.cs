@@ -3,14 +3,6 @@ using Eyetracking.NET;
 
 namespace EyeTrackingVsix.Common
 {
-    public static class FrameworkElementExtensions
-    {
-        public static Point GetRelativeGazePoint(this FrameworkElement element, IEyetracker eyetracker)
-        {
-            return WpfHelpers.GetRelativeGazePointForElement(eyetracker, element);
-        }
-    }
-
     public static class IEyetrackerExtensions
     {
         public static bool IsLookingAt(this IEyetracker eyetracker, FrameworkElement element)
