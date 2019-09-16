@@ -14,7 +14,6 @@ namespace EyeTrackingVsix.Features.Scroll
         {
             _elm = elm;
             _eyetracker = eyetracker;
-
         }
 
         public bool HasGaze => _eyetracker.IsLookingAt(_elm);

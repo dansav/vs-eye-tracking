@@ -1,26 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using EnvDTE;
+using EnvDTE80;
 using EyeTrackingVsix.Services;
 using EyeTrackingVsix.Utils;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Window = EnvDTE.Window;
 
 namespace EyeTrackingVsix
 {
     public class FocusableWindowManager
     {
-        private readonly List<Window> _openWindows;
+        private readonly object _openWindowsLock = new object();
+        private readonly List<IVsWindowFrame> _openWindows;
+        private IVsUIShell _shell;
 
-        public FocusableWindowManager(Windows windows, WindowEvents events, IEyetrackerService eyetracker, IKeyboardEventService keyboardEventService)
+        public FocusableWindowManager(IVsUIShell shell, WindowEvents events, IEyetrackerService eyetracker, IKeyboardEventService keyboardEventService)
         {
-            _openWindows = new List<Window>();
-            foreach (Window window in windows)
-            {
-                _openWindows.Add(window);
-            }
+            _shell = shell;
+            _openWindows = new List<IVsWindowFrame>();
+
             events.WindowCreated += OnWindowCreated;
             events.WindowClosing += OnWindowClosing;
             events.WindowActivated += OnWindowActivated;
@@ -32,90 +35,128 @@ namespace EyeTrackingVsix
             var dpiX = scaling.DpiScaleX;
             var dpiY = scaling.DpiScaleY;
 
-            // todo: use the keyboard event aggregator
             keyboardEventService.ChangeFocus += () =>
             {
                 ThreadHelper.ThrowIfNotOnUIThread();
 
                 // note: there might be floating windows outside main window bounds
                 var lookingAtApp = eyetracker.IsLookingAt(wpfWindow);
-                Logger.Log($"Gaze point: {(lookingAtApp ? "" : "not")} looking at VS");
+                Logger.Log($"FocusableWindowManager ChangeFocus: {(lookingAtApp ? "L" : "Not l")}ooking at VS");
 
-                var main = windows.Parent.MainWindow;
-
-                foreach (var openWindow in _openWindows)
+                IVsWindowFrame[] openWindows;
+                lock (_openWindowsLock)
                 {
-                    if (openWindow != main && openWindow.Visible)
+                    openWindows = _openWindows.ToArray();
+                }
+
+                foreach (var openWindow in openWindows)
+                {
+                    if (openWindow.IsVisible() == 0 && openWindow.IsOnScreen(out var onScreen) == 0 && onScreen != 0)
                     {
-                        var winRect = CreateWindowRect(openWindow, dpiX, dpiY);
+                        var winRect = CreateWindowRect(openWindow as IVsWindowFrame4, dpiX, dpiY);
                         if (eyetracker.IsGazeInScreenRegion(winRect))
                         {
-                            Logger.Log($"You looked at {openWindow.Caption} ({_openWindows.IndexOf(openWindow) + 1})");
-                            openWindow.SetFocus();
+                            dynamic test = openWindow;
+
+                            string title = test.Title;
+
+                            Logger.Log($"You looked at {title} ({openWindow.GetType()})");
+                            openWindow.Show();
                         }
                     }
                 }
             };
         }
 
-        private static Rect CreateWindowRect(Window win, double dpiX, double DpiY)
+        private static Rect CreateWindowRect(IVsWindowFrame4 win, double dpiX, double DpiY)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
+            win.GetWindowScreenRect(out var x, out var y, out var w, out var h);
+
             // fix inverted dpi
-            var x = win.Left / dpiX;
-            var y = win.Top / DpiY;
-            var w = win.Width / dpiX;
-            var h = win.Height / DpiY;
+            //var x = win.Left / dpiX;
+            //var y = win.Top / DpiY;
+            //var w = win.Width / dpiX;
+            //var h = win.Height / DpiY;
 
             return new Rect(x, y, w, h);
         }
 
         private void OnWindowMoved(Window window, int top, int left, int width, int height)
         {
-            // it appears like this method is always called for new windows
-            if (_openWindows.IndexOf(window) < 0)
-            {
-                _openWindows.Add(window);
-            }
-
             ThreadHelper.ThrowIfNotOnUIThread();
+            Logger.Log($"Window was moved: {window.Caption} {window.Visible} top:{top} left:{left} width:{width} height:{height}");
 
-            Logger.Log($"Window was moved: {_openWindows.IndexOf(window) + 1} {window.Visible} top:{top} left:{left} width:{width} height:{height}");
+            UpdateWindowList();
         }
 
         private void OnWindowActivated(Window gotfocus, Window lostfocus)
         {
+#if DEBUG
             ThreadHelper.ThrowIfNotOnUIThread();
-
-            Logger.Log($"Window got focus: {_openWindows.IndexOf(gotfocus) + 1}, lost focus: {_openWindows.IndexOf(lostfocus) + 1}");
-
-            var kind = gotfocus.Kind;
-
-            if (gotfocus.Object is OutputWindow ow)
-            {
-                var p = ow.ActivePane;
-            }
-
+            Logger.Log($"Window got focus: {gotfocus?.Caption ?? "N/A"}, lost focus: {lostfocus?.Caption ?? "N/A"}");
+#endif
         }
 
         private void OnWindowCreated(Window window)
         {
-            if (_openWindows.IndexOf(window) < 0)
-            {
-                _openWindows.Add(window);
-            }
             ThreadHelper.ThrowIfNotOnUIThread();
+            Logger.Log($"Window was created: {window.Caption}");
 
-            Logger.Log($"Window was created. Total active count: {_openWindows.Count}");
+            UpdateWindowList();
         }
 
         private void OnWindowClosing(Window window)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
+            Logger.Log($"Window is closing: {window.Caption}");
 
-            Logger.Log($"Window is closing: {_openWindows.IndexOf(window) + 1}");
-            _openWindows.Remove(window);
+            UpdateWindowList();
+        }
+
+        private void UpdateWindowList()
+        {
+            var documents = GetDocumentWindows();
+            var tools = GetToolWindows();
+
+            lock (_openWindowsLock)
+            {
+                _openWindows.Clear();
+                _openWindows.AddRange(documents);
+                _openWindows.AddRange(tools);
+            }
+        }
+
+        private List<IVsWindowFrame> GetDocumentWindows()
+        {
+            var tmpList = new List<IVsWindowFrame>();
+
+            if (_shell.GetDocumentWindowEnum(out var ppenum) == 0)
+            {
+                var frame = new IVsWindowFrame[1];
+                while (ppenum.Next(1, frame, out var count) == 0 && frame[0] != null)
+                {
+                    tmpList.Add(frame[0]);
+                }
+            }
+
+            return tmpList;
+        }
+
+        private List<IVsWindowFrame> GetToolWindows()
+        {
+            var tmpList = new List<IVsWindowFrame>();
+            if (_shell.GetToolWindowEnum(out var ppenum) == 0)
+            {
+                var frame = new IVsWindowFrame[1];
+                while (ppenum.Next(1, frame, out var count) == 0 && frame[0] != null)
+                {
+                    tmpList.Add(frame[0]);
+                }
+            }
+
+            return tmpList;
         }
     }
 }

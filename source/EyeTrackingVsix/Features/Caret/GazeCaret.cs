@@ -21,21 +21,20 @@ namespace EyeTrackingVsix.Features.MoveCarret
             _eyetracker = eyetracker;
 
             _textView.Closed += OnTextViewClosed;
-            _keyboard.MoveCaret += OnCarretAction;
+            _keyboard.MoveCaret += OnCaretAction;
         }
 
         private void OnTextViewClosed(object sender, EventArgs e)
         {
-            _keyboard.MoveCaret -= OnCarretAction;
+            _keyboard.MoveCaret -= OnCaretAction;
             _textView.Closed -= OnTextViewClosed;
         }
 
-        private void OnCarretAction()
+        private void OnCaretAction()
         {
-            Logger.Log($"GazeCaret.OnCarretAction {_textView.HasAggregateFocus}");
+            Logger.Log($"GazeCaret.OnCaretAction {_textView.HasAggregateFocus}");
 
-
-            //TODO: maybe...
+            // only move the caret in the focused window
             if (!_textView.HasAggregateFocus) return;
 
             var elm = _textView.VisualElement;

@@ -56,7 +56,7 @@ namespace EyeTrackingVsix.Features.Scroll
         private void StartScroll()
         {
             //TODO: maybe...
-            if (!_textView.HasAggregateFocus) return;
+            //if (!_textView.HasAggregateFocus) return;
 
             IRelativeGazeTransformer relativeGaze = new CenterOfElementGazeTransformer(_textView.VisualElement, _eyetracker);
 

@@ -11,6 +11,7 @@ using EyeTrackingVsix.Services;
 using EyeTrackingVsix.Utils;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
 
 namespace EyeTrackingVsix
@@ -75,12 +76,12 @@ namespace EyeTrackingVsix
 
             await Logger.InitializeAsync(this, "Eye Tracking for Visual Studio");
 
-            if (await GetServiceAsync(typeof(DTE)) is DTE dte)
+            if (await GetServiceAsync(typeof(DTE)) is DTE dte && await GetServiceAsync(typeof(SVsUIShell)) is IVsUIShell shell)
             {
                 _eyetrackerService = new EyetrackerService(this);
                 _keyboardEventService = new KeyboardEventService(this, System.Windows.Application.Current.MainWindow, GeneralOptions.Instance);
 
-                new FocusableWindowManager(dte.Windows, dte.Events.WindowEvents, _eyetrackerService, _keyboardEventService);
+                new FocusableWindowManager(shell, dte.Events.WindowEvents, _eyetrackerService, _keyboardEventService);
             }
         }
 

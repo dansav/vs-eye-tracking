@@ -29,14 +29,14 @@ namespace EyeTrackingVsix.Services
         public bool IsGazeInScreenRegion(Rect region)
         {
             var gazeScreenPoint = ScreenHelpers.GetGazePointInScreenPixels(_eyetracker);
-            Logger.Log($"Gaze point: {gazeScreenPoint}");
+            //Logger.Log($"Gaze point: {gazeScreenPoint}");
 
             return region.Contains(gazeScreenPoint);
         }
 
         public bool IsLookingAt(FrameworkElement element)
         {
-            return _eyetracker.IsLookingAt(element);
+            return element.IsLoaded && element.IsHitTestVisible &&_eyetracker.IsLookingAt(element);
         }
 
         public Point GetRelativeGazePoint(FrameworkElement element)
