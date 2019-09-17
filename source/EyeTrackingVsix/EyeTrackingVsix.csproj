@@ -49,6 +49,7 @@
     <Compile Include="..\..\output\AssemblyVersion.generated.cs">
       <Link>Properties\AssemblyVersion.generated.cs</Link>
     </Compile>
+    <Compile Include="Features\WindowFocus\DteWindowExtensions.cs" />
     <Compile Include="Features\Scroll\CenterOfElementGazeTransformer.cs" />
     <Compile Include="Features\Scroll\DynamicVelocityProvider.cs" />
     <Compile Include="Features\Scroll\ExponentialVelocityProvider.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Features\Scroll\LinearVelocityProvider.cs" />
     <Compile Include="Features\Scroll\ScrollSettings.cs" />
     <Compile Include="Features\Scroll\StaticVelocityProvider.cs" />
+    <Compile Include="Features\WindowFocus\FocusableWindowManager.cs" />
     <Compile Include="Options\DialogPageProvider.cs" />
     <Compile Include="Options\GeneralOptions.cs" />
     <Compile Include="Common\Keyboard\InteractionKey.cs" />
@@ -78,6 +80,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EyeTrackingVsixPackage.cs" />
     <Compile Include="Common\ScrollRequest.cs" />
+    <Compile Include="Services\EyetrackerService.cs" />
+    <Compile Include="Services\KeyboardEventService.cs" />
     <Compile Include="Utils\Logger.cs" />
     <Compile Include="WpfTextViewListener.cs" />
   </ItemGroup>

@@ -1,37 +1,39 @@
-﻿using Microsoft.VisualStudio.Text.Editor;
-using System;
-using System.Windows;
+﻿using System;
 using System.Windows.Input;
+using WpfKeyboard = System.Windows.Input.Keyboard;
 
 namespace EyeTrackingVsix.Common
 {
     public class KeyboardEventAggregator
     {
-        private readonly IWpfTextView _textView;
         private readonly IKeyboardSettings _settings;
 
         private KeyboardSequenceDetector[] _detectors;
 
         private ScrollRequest _scrollState;
 
-        public KeyboardEventAggregator(IWpfTextView textView, IKeyboardSettings settings)
+        public KeyboardEventAggregator(InputManager inputManager, IKeyboardSettings settings)
         {
             _settings = settings;
-            _textView = textView;
 
-            Rebuild(this, EventArgs.Empty);
-
-            _textView.GotAggregateFocus += Rebuild;
-            _textView.Closed += OnTextViewClosed;
-            _textView.VisualElement.Loaded += VisualElementOnLoaded;
-            _textView.VisualElement.Unloaded += VisualElementOnUnloaded;
+            inputManager.PreNotifyInput += (sender, args) =>
+            {
+                if (args.StagingItem.Input is KeyEventArgs keyArgs && (keyArgs.RoutedEvent == WpfKeyboard.PreviewKeyDownEvent || keyArgs.RoutedEvent == WpfKeyboard.PreviewKeyUpEvent))
+                {
+                    var detectors = _detectors;
+                    foreach (var detector in detectors)
+                    {
+                        detector.Update(keyArgs.Key, keyArgs.IsDown);
+                    }
+                }
+            };
         }
 
         public event Action<ScrollRequest> UpdateScroll;
 
         public event Action MoveCaret;
 
-        private void Rebuild(object sender, EventArgs args)
+        public void Rebuild()
         {
             //string docName = "UNKNOWN";
             //if (_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out var textDoc))
@@ -90,45 +92,6 @@ namespace EyeTrackingVsix.Common
                 startScroll,
                 stopScroll
             };
-        }
-
-        private void OnTextViewClosed(object sender, EventArgs e)
-        {
-            _textView.Closed -= OnTextViewClosed;
-            _textView.VisualElement.Loaded -= VisualElementOnLoaded;
-            _textView.VisualElement.Unloaded -= VisualElementOnUnloaded;
-            _textView.VisualElement.PreviewKeyDown -= VisualElementOnPreviewKeyDown;
-            _textView.VisualElement.PreviewKeyUp -= VisualElementOnPreviewKeyUp;
-        }
-
-        private void VisualElementOnLoaded(object sender, RoutedEventArgs e)
-        {
-            _textView.VisualElement.PreviewKeyDown += VisualElementOnPreviewKeyDown;
-            _textView.VisualElement.PreviewKeyUp += VisualElementOnPreviewKeyUp;
-        }
-
-        private void VisualElementOnUnloaded(object sender, RoutedEventArgs e)
-        {
-            _textView.VisualElement.PreviewKeyDown -= VisualElementOnPreviewKeyDown;
-            _textView.VisualElement.PreviewKeyUp -= VisualElementOnPreviewKeyUp;
-        }
-
-        private void VisualElementOnPreviewKeyUp(object sender, KeyEventArgs e)
-        {
-            var detectors = _detectors;
-            foreach (var detector in detectors)
-            {
-                detector.Update(e.Key, e.IsDown);
-            }
-        }
-
-        private void VisualElementOnPreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            var detectors = _detectors;
-            foreach (var detector in detectors)
-            {
-                detector.Update(e.Key, e.IsDown);
-            }
         }
     }
 }

@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Windows;
-using Eyetracking.NET;
 using EyeTrackingVsix.Common;
+using EyeTrackingVsix.Services;
 
 namespace EyeTrackingVsix.Features.Scroll
 {
     public class CenterOfElementGazeTransformer : IRelativeGazeTransformer
     {
         private readonly FrameworkElement _elm;
-        private readonly IEyetracker _eyetracker;
+        private readonly IEyetrackerService _eyetracker;
 
-        public CenterOfElementGazeTransformer(FrameworkElement elm, IEyetracker eyetracker)
+        public CenterOfElementGazeTransformer(FrameworkElement elm, IEyetrackerService eyetracker)
         {
             _elm = elm;
             _eyetracker = eyetracker;
-
         }
 
         public bool HasGaze => _eyetracker.IsLookingAt(_elm);
@@ -32,7 +31,7 @@ namespace EyeTrackingVsix.Features.Scroll
         {
             get
             {
-                var gazePoint = _elm.GetRelativeGazePoint(_eyetracker);
+                var gazePoint = _eyetracker.GetRelativeGazePoint(_elm);
                 if (WpfHelpers.IsLookingAtElement(gazePoint, _elm))
                 {
                     // 0 .. 1

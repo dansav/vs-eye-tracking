@@ -1,22 +1,23 @@
-﻿using Eyetracking.NET;
-using EyeTrackingVsix.Common;
-using Microsoft.VisualStudio.Text.Editor;
-using System;
+﻿using System;
 using System.Collections;
 using CoroutinesForWpf;
+using EyeTrackingVsix.Common;
+using EyeTrackingVsix.Services;
+using EyeTrackingVsix.Utils;
+using Microsoft.VisualStudio.Text.Editor;
 
 namespace EyeTrackingVsix.Features.Scroll
 {
     public class GazeScroll
     {
         private readonly IWpfTextView _textView;
-        private readonly KeyboardEventAggregator _keyboard;
-        private readonly IEyetracker _eyetracker;
+        private readonly IKeyboardEventService _keyboard;
+        private readonly IEyetrackerService _eyetracker;
         private readonly IVelocityProvider _velocityProvider;
 
         private DateTime _timestamp;
 
-        public GazeScroll(IWpfTextView textView, KeyboardEventAggregator keyboard, IEyetracker eyetracker, IVelocityProvider velocityProvider)
+        public GazeScroll(IWpfTextView textView, IKeyboardEventService keyboard, IEyetrackerService eyetracker, IVelocityProvider velocityProvider)
         {
             _textView = textView;
             _keyboard = keyboard;
@@ -35,6 +36,7 @@ namespace EyeTrackingVsix.Features.Scroll
 
         private void OnUpdateScroll(ScrollRequest newState)
         {
+            Logger.Log($"GazeScroll.OnUpdateScroll: {newState} {_textView.HasAggregateFocus}");
             switch (newState)
             {
                 case ScrollRequest.Start:
