@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Windows;
+using System.Windows.Input;
 using EyeTrackingVsix.Common;
 using EyeTrackingVsix.Options;
 using EyeTrackingVsix.Utils;
@@ -10,9 +10,9 @@ namespace EyeTrackingVsix.Services
     {
         private readonly KeyboardEventAggregator _aggregator;
 
-        internal KeyboardEventService(Microsoft.VisualStudio.OLE.Interop.IServiceProvider serviceProvider, Window mainWindow, GeneralOptions options)
+        internal KeyboardEventService(Microsoft.VisualStudio.OLE.Interop.IServiceProvider serviceProvider, InputManager inputManager, GeneralOptions options)
         {
-            _aggregator = new KeyboardEventAggregator(mainWindow, new KeyboardSettings(options));
+            _aggregator = new KeyboardEventAggregator(inputManager, new KeyboardSettings(options));
             _aggregator.MoveCaret += OnMoveCaret;
             _aggregator.UpdateScroll += OnUpdateScroll;
 

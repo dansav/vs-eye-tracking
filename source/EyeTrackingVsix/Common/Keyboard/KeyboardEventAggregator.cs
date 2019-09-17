@@ -1,26 +1,32 @@
-﻿using Microsoft.VisualStudio.Text.Editor;
-using System;
-using System.Windows;
+﻿using System;
 using System.Windows.Input;
+using WpfKeyboard = System.Windows.Input.Keyboard;
 
 namespace EyeTrackingVsix.Common
 {
     public class KeyboardEventAggregator
     {
-        private readonly FrameworkElement _element;
         private readonly IKeyboardSettings _settings;
 
         private KeyboardSequenceDetector[] _detectors;
 
         private ScrollRequest _scrollState;
 
-        public KeyboardEventAggregator(FrameworkElement element, IKeyboardSettings settings)
+        public KeyboardEventAggregator(InputManager inputManager, IKeyboardSettings settings)
         {
-            _element = element;
             _settings = settings;
 
-            _element.PreviewKeyDown += VisualElementOnPreviewKeyDown;
-            _element.PreviewKeyUp += VisualElementOnPreviewKeyUp;
+            inputManager.PreNotifyInput += (sender, args) =>
+            {
+                if (args.StagingItem.Input is KeyEventArgs keyArgs && (keyArgs.RoutedEvent == WpfKeyboard.PreviewKeyDownEvent || keyArgs.RoutedEvent == WpfKeyboard.PreviewKeyUpEvent))
+                {
+                    var detectors = _detectors;
+                    foreach (var detector in detectors)
+                    {
+                        detector.Update(keyArgs.Key, keyArgs.IsDown);
+                    }
+                }
+            };
         }
 
         public event Action<ScrollRequest> UpdateScroll;
@@ -86,24 +92,6 @@ namespace EyeTrackingVsix.Common
                 startScroll,
                 stopScroll
             };
-        }
-
-        private void VisualElementOnPreviewKeyUp(object sender, KeyEventArgs e)
-        {
-            var detectors = _detectors;
-            foreach (var detector in detectors)
-            {
-                detector.Update(e.Key, e.IsDown);
-            }
-        }
-
-        private void VisualElementOnPreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            var detectors = _detectors;
-            foreach (var detector in detectors)
-            {
-                detector.Update(e.Key, e.IsDown);
-            }
         }
     }
 }

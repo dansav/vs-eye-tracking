@@ -79,7 +79,7 @@ namespace EyeTrackingVsix
             if (await GetServiceAsync(typeof(DTE)) is DTE dte && await GetServiceAsync(typeof(SVsUIShell)) is IVsUIShell shell)
             {
                 _eyetrackerService = new EyetrackerService(this);
-                _keyboardEventService = new KeyboardEventService(this, System.Windows.Application.Current.MainWindow, GeneralOptions.Instance);
+                _keyboardEventService = new KeyboardEventService(this, System.Windows.Input.InputManager.Current, GeneralOptions.Instance);
 
                 new FocusableWindowManager(shell, dte.Events.WindowEvents, _eyetrackerService, _keyboardEventService);
             }
