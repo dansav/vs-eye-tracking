@@ -2,7 +2,6 @@
 using System.Windows.Input;
 using EyeTrackingVsix.Common;
 using EyeTrackingVsix.Options;
-using EyeTrackingVsix.Utils;
 
 namespace EyeTrackingVsix.Services
 {
@@ -26,16 +25,23 @@ namespace EyeTrackingVsix.Services
 
         private void OnUpdateScroll(ScrollRequest request)
         {
-            UpdateScroll?.Invoke(request);
+            if (GeneralOptions.Instance.ScrollEnabled)
+            {
+                UpdateScroll?.Invoke(request);
+            }
         }
 
         private void OnMoveCaret()
         {
-            Logger.Log("KeyboardEventService.OnMoveCaret 1");
-            ChangeFocus?.Invoke();
-            Logger.Log("KeyboardEventService.OnMoveCaret 2");
-            MoveCaret?.Invoke();
-            Logger.Log("KeyboardEventService.OnMoveCaret 3");
+            if (GeneralOptions.Instance.WindowFocusEnabled)
+            {
+                ChangeFocus?.Invoke();
+            }
+
+            if (GeneralOptions.Instance.CaretEnabled)
+            {
+                MoveCaret?.Invoke();
+            }
         }
     }
 

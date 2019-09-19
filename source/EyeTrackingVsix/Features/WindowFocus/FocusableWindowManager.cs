@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 using EnvDTE;
-using EnvDTE80;
+using EyeTrackingVsix.Options;
 using EyeTrackingVsix.Services;
 using EyeTrackingVsix.Utils;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Window = EnvDTE.Window;
 
 namespace EyeTrackingVsix
 {
@@ -17,7 +14,7 @@ namespace EyeTrackingVsix
     {
         private readonly object _openWindowsLock = new object();
         private readonly List<IVsWindowFrame> _openWindows;
-        private IVsUIShell _shell;
+        private readonly IVsUIShell _shell;
 
         public FocusableWindowManager(IVsUIShell shell, WindowEvents events, IEyetrackerService eyetracker, IKeyboardEventService keyboardEventService)
         {
@@ -29,7 +26,7 @@ namespace EyeTrackingVsix
             events.WindowActivated += OnWindowActivated;
             events.WindowMoved += OnWindowMoved;
 
-            var wpfWindow = System.Windows.Application.Current.MainWindow;
+            var wpfWindow = Application.Current.MainWindow;
             var scaling = VisualTreeHelper.GetDpi(wpfWindow);
 
             var dpiX = scaling.DpiScaleX;
@@ -37,6 +34,8 @@ namespace EyeTrackingVsix
 
             keyboardEventService.ChangeFocus += () =>
             {
+                if (!GeneralOptions.Instance.WindowFocusEnabled) return;
+
                 ThreadHelper.ThrowIfNotOnUIThread();
 
                 // note: there might be floating windows outside main window bounds
@@ -53,7 +52,7 @@ namespace EyeTrackingVsix
                 {
                     if (openWindow.IsVisible() == 0 && openWindow.IsOnScreen(out var onScreen) == 0 && onScreen != 0)
                     {
-                        var winRect = CreateWindowRect(openWindow as IVsWindowFrame4, dpiX, dpiY);
+                        var winRect = CreateWindowRect(openWindow, dpiX, dpiY);
                         if (eyetracker.IsGazeInScreenRegion(winRect))
                         {
                             dynamic test = openWindow;
@@ -68,22 +67,26 @@ namespace EyeTrackingVsix
             };
         }
 
-        private static Rect CreateWindowRect(IVsWindowFrame4 win, double dpiX, double DpiY)
+        private static Rect CreateWindowRect(IVsWindowFrame win, double dpiX, double dpiY)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            win.GetWindowScreenRect(out var x, out var y, out var w, out var h);
+            if (win is IVsWindowFrame4 win4)
+            {
+                win4.GetWindowScreenRect(out var x, out var y, out var w, out var h);
+                return new Rect(x, y, w, h);
+            }
 
-            // fix inverted dpi
+            // fix inverted dpi (see https://developercommunity.visualstudio.com/content/problem/733252/wrong-scaling-of-bounds-of-window-objects-via-envd.html)
             //var x = win.Left / dpiX;
-            //var y = win.Top / DpiY;
+            //var y = win.Top / dpiY;
             //var w = win.Width / dpiX;
-            //var h = win.Height / DpiY;
+            //var h = win.Height / dpiY;
 
-            return new Rect(x, y, w, h);
+            return new Rect(0, 0, 0, 0);
         }
 
-        private void OnWindowMoved(Window window, int top, int left, int width, int height)
+        private void OnWindowMoved(EnvDTE.Window window, int top, int left, int width, int height)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
             Logger.Log($"Window was moved: {window.Caption} {window.Visible} top:{top} left:{left} width:{width} height:{height}");
@@ -91,15 +94,15 @@ namespace EyeTrackingVsix
             UpdateWindowList();
         }
 
-        private void OnWindowActivated(Window gotfocus, Window lostfocus)
+        private void OnWindowActivated(EnvDTE.Window gotFocus, EnvDTE.Window lostFocus)
         {
 #if DEBUG
             ThreadHelper.ThrowIfNotOnUIThread();
-            Logger.Log($"Window got focus: {gotfocus?.Caption ?? "N/A"}, lost focus: {lostfocus?.Caption ?? "N/A"}");
+            Logger.Log($"Window got focus: {gotFocus?.Caption ?? "N/A"}, lost focus: {lostFocus?.Caption ?? "N/A"}");
 #endif
         }
 
-        private void OnWindowCreated(Window window)
+        private void OnWindowCreated(EnvDTE.Window window)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
             Logger.Log($"Window was created: {window.Caption}");
@@ -107,7 +110,7 @@ namespace EyeTrackingVsix
             UpdateWindowList();
         }
 
-        private void OnWindowClosing(Window window)
+        private void OnWindowClosing(EnvDTE.Window window)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
             Logger.Log($"Window is closing: {window.Caption}");
@@ -130,12 +133,14 @@ namespace EyeTrackingVsix
 
         private List<IVsWindowFrame> GetDocumentWindows()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             var tmpList = new List<IVsWindowFrame>();
 
-            if (_shell.GetDocumentWindowEnum(out var ppenum) == 0)
+            if (_shell.GetDocumentWindowEnum(out var documentWindowEnum) == 0)
             {
                 var frame = new IVsWindowFrame[1];
-                while (ppenum.Next(1, frame, out var count) == 0 && frame[0] != null)
+                while (documentWindowEnum.Next(1, frame, out var count) == 0 && frame[0] != null)
                 {
                     tmpList.Add(frame[0]);
                 }
@@ -146,11 +151,13 @@ namespace EyeTrackingVsix
 
         private List<IVsWindowFrame> GetToolWindows()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             var tmpList = new List<IVsWindowFrame>();
-            if (_shell.GetToolWindowEnum(out var ppenum) == 0)
+            if (_shell.GetToolWindowEnum(out var toolWindowEnum) == 0)
             {
                 var frame = new IVsWindowFrame[1];
-                while (ppenum.Next(1, frame, out var count) == 0 && frame[0] != null)
+                while (toolWindowEnum.Next(1, frame, out var count) == 0 && frame[0] != null)
                 {
                     tmpList.Add(frame[0]);
                 }
