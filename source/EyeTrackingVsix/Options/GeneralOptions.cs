@@ -42,6 +42,14 @@ namespace EyeTrackingVsix.Options
 
         // --------------------------------------------------------------------
 
+        [Category("Window Focus")]
+        [DisplayName("Enabled")]
+        [Description("Enable or disable the window focus feature")]
+        [DefaultValue(true)]
+        public bool WindowFocusEnabled { get; set; } = true;
+
+        // --------------------------------------------------------------------
+
         [Category("Scroll")]
         [DisplayName("Enabled")]
         [Description("Enable or disable the scroll feature")]
@@ -84,6 +92,7 @@ namespace EyeTrackingVsix.Options
         [DefaultValue(0.025)]
         public double ScrollExponentialInertia { get; set; } = 0.025;
 
+        // --------------------------------------------------------------------
 
         public event Action GeneralOptionsChanged;
 
