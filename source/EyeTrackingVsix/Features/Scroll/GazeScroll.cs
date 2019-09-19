@@ -1,23 +1,23 @@
-﻿using Eyetracking.NET;
-using EyeTrackingVsix.Common;
-using Microsoft.VisualStudio.Text.Editor;
-using System;
+﻿using System;
 using System.Collections;
-using System.Windows;
 using CoroutinesForWpf;
+using EyeTrackingVsix.Common;
+using EyeTrackingVsix.Services;
+using EyeTrackingVsix.Utils;
+using Microsoft.VisualStudio.Text.Editor;
 
 namespace EyeTrackingVsix.Features.Scroll
 {
     public class GazeScroll
     {
         private readonly IWpfTextView _textView;
-        private readonly KeyboardEventAggregator _keyboard;
-        private readonly IEyetracker _eyetracker;
+        private readonly IKeyboardEventService _keyboard;
+        private readonly IEyetrackerService _eyetracker;
         private readonly IVelocityProvider _velocityProvider;
 
         private DateTime _timestamp;
 
-        public GazeScroll(IWpfTextView textView, KeyboardEventAggregator keyboard, IEyetracker eyetracker, IVelocityProvider velocityProvider)
+        public GazeScroll(IWpfTextView textView, IKeyboardEventService keyboard, IEyetrackerService eyetracker, IVelocityProvider velocityProvider)
         {
             _textView = textView;
             _keyboard = keyboard;
@@ -36,6 +36,7 @@ namespace EyeTrackingVsix.Features.Scroll
 
         private void OnUpdateScroll(ScrollRequest newState)
         {
+            Logger.Log($"GazeScroll.OnUpdateScroll: {newState} {_textView.HasAggregateFocus}");
             switch (newState)
             {
                 case ScrollRequest.Start:
@@ -54,14 +55,14 @@ namespace EyeTrackingVsix.Features.Scroll
 
         private void StartScroll()
         {
-            var elm = _textView.VisualElement;
-            if (!_eyetracker.IsLookingAt(elm)) return;
+            IRelativeGazeTransformer relativeGaze = new CenterOfElementGazeTransformer(_textView.VisualElement, _eyetracker);
+
+            if (!relativeGaze.HasGaze) return;
 
             Executor.StartCoroutine(DoScroll());
 
             _timestamp = DateTime.Now;
-            var direction = GetScrollDirection(elm);
-            _velocityProvider.Start(direction);
+            _velocityProvider.Start(relativeGaze);
         }
 
         private IEnumerator DoScroll()
@@ -72,17 +73,13 @@ namespace EyeTrackingVsix.Features.Scroll
                 _timestamp = DateTime.Now;
 
                 var scrollLength = _velocityProvider.Velocity * elapsed;
-                _textView.ViewScroller.ScrollViewportVerticallyByPixels(scrollLength);
+
+                // invert direction since it is the viewport that scrolls and not the document
+                // see https://docs.microsoft.com/en-us/dotnet/api/microsoft.visualstudio.text.editor.iviewscroller.scrollviewportverticallybypixels?view=visualstudiosdk-2019
+                _textView.ViewScroller.ScrollViewportVerticallyByPixels(-scrollLength);
 
                 yield return null;
             }
-        }
-
-        private int GetScrollDirection(FrameworkElement elm)
-        {
-            var gazePoint = elm.GetRelativeGazePoint(_eyetracker);
-            var center = elm.ActualHeight / 2;
-            return Math.Sign(center - gazePoint.Y);
         }
     }
 }

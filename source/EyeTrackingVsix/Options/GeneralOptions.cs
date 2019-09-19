@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
 using EyeTrackingVsix.Common.Keyboard;
 using EyeTrackingVsix.Features.Scroll;
 
@@ -37,6 +39,14 @@ namespace EyeTrackingVsix.Options
         [Description("Select the key on the keyboard that will be used to trigger the caret jump.")]
         [DefaultValue(InteractionKey.RightCtrl)]
         public InteractionKey CaretKey { get; set; } = InteractionKey.RightCtrl;
+
+        // --------------------------------------------------------------------
+
+        [Category("Window Focus")]
+        [DisplayName("Enabled")]
+        [Description("Enable or disable the window focus feature")]
+        [DefaultValue(true)]
+        public bool WindowFocusEnabled { get; set; } = true;
 
         // --------------------------------------------------------------------
 
@@ -81,5 +91,15 @@ namespace EyeTrackingVsix.Options
         [Description("A higher number breaks to no scroll faster. Reccomended values: between 0.001 and 0.05. (only applicable if Exponential scroll type is selected)")]
         [DefaultValue(0.025)]
         public double ScrollExponentialInertia { get; set; } = 0.025;
+
+        // --------------------------------------------------------------------
+
+        public event Action GeneralOptionsChanged;
+
+        public override Task SaveAsync()
+        {
+            GeneralOptionsChanged?.Invoke();
+            return base.SaveAsync();
+        }
     }
 }

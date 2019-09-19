@@ -31,10 +31,10 @@ namespace EyeTrackingVsix.Features.Scroll
                 return _velocity;
             }
         }
-        public void Start(int direction)
+        public void Start(IRelativeGazeTransformer relativeGaze)
         {
             _keyDown = true;
-            _baseVelocity = direction * _settings.Velocity;
+            _baseVelocity = relativeGaze.Direction.Y * _settings.Velocity;
         }
 
         public void Stop()

@@ -107,6 +107,12 @@ Task("Test")
 });
 
 Task("Publish")
+    .IsDependentOn("Publish.Prepare")
+    .IsDependentOn("Publish.UploadToVsixGallery")
+    //.IsDependentOn("Publish.UploadToVisualStudioMarketplace")
+    ;
+
+Task("Publish.Prepare")
     .Does(() =>
 {
     var baseFileName = "EyeTrackingVsix";
@@ -118,7 +124,8 @@ Task("Publish")
     MoveFile(sourcePath, targetPath);
 });
 
-Task("UploadToVsixGallery")
+Task("Publish.UploadToVsixGallery")
+    // TODO: when it is time to publish to VS Marketplace, change this to target develop-branch and/or release-branches
     .WithCriteria(() => version.BranchName == "master" && !BuildSystem.IsLocalBuild && !BuildSystem.IsPullRequest)
     .Does(() =>
 {
@@ -142,6 +149,16 @@ Task("UploadToVsixGallery")
     Information("Done!");
 });
 
+Task("Publish.UploadToVisualStudioMarketplace")
+    .WithCriteria(() => version.BranchName == "master" && !BuildSystem.IsLocalBuild && !BuildSystem.IsPullRequest)
+    .Does(() => 
+{
+    /*
+        Compile info from these links to create the correct upload script:
+        * https://docs.microsoft.com/en-us/visualstudio/extensibility/walkthrough-publishing-a-visual-studio-extension-via-command-line?view=vs-2019
+        * https://www.meziantou.net/ci-cd-pipeline-for-a-visual-studio-extension-vsix-using-azure-devops.htm
+    */
+});
 
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
@@ -153,8 +170,7 @@ Task("Default")
     .IsDependentOn("UpdateVersionNumbers")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
-    .IsDependentOn("Publish")
-    .IsDependentOn("UploadToVsixGallery");
+    .IsDependentOn("Publish");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION

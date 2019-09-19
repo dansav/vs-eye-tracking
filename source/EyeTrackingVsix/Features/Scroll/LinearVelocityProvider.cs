@@ -29,10 +29,10 @@ namespace EyeTrackingVsix.Features.Scroll
             }
         }
 
-        public void Start(int direction)
+        public void Start(IRelativeGazeTransformer relativeGaze)
         {
             _start = DateTimeOffset.Now;
-            _baseVelocity = direction * _settings.Velocity;
+            _baseVelocity = relativeGaze.Direction.Y * _settings.Velocity;
             HasVelocity = true;
         }
 

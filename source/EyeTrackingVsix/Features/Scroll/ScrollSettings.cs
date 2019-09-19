@@ -24,7 +24,8 @@ namespace EyeTrackingVsix.Features.Scroll
     {
         Static,
         Linear,
-        Exponential
+        Exponential,
+        Dynamic
     }
 
     public static class VelocityProviderFactory
@@ -34,6 +35,7 @@ namespace EyeTrackingVsix.Features.Scroll
             { ScrollType.Static, () => new StaticVelocityProvider(new ScrollSettings(GeneralOptions.Instance)) },
             { ScrollType.Linear, () => new LinearVelocityProvider(new ScrollSettings(GeneralOptions.Instance)) },
             { ScrollType.Exponential, () => new ExponentialVelocityProvider(new ScrollSettings(GeneralOptions.Instance)) },
+            { ScrollType.Dynamic, () => new DynamicVelocityProvider(new ScrollSettings(GeneralOptions.Instance)) },
         };
 
         public static IVelocityProvider Create(ScrollType type)

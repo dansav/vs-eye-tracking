@@ -23,10 +23,9 @@ namespace EyeTrackingVsix.Utils
 
         public static void Log(object message)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
             try
             {
+                ThreadHelper.ThrowIfNotOnUIThread();
                 if (_pane == null)
                 {
                     var guid = Guid.NewGuid();

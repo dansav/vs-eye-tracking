@@ -2,8 +2,8 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
-using Eyetracking.NET;
-using EyeTrackingVsix.Common;
+using EyeTrackingVsix.Services;
+using EyeTrackingVsix.Utils;
 using Microsoft.VisualStudio.Text.Editor;
 
 namespace EyeTrackingVsix.Features.MoveCarret
@@ -11,24 +11,36 @@ namespace EyeTrackingVsix.Features.MoveCarret
     public class GazeCaret
     {
         private readonly IWpfTextView _textView;
-        private readonly KeyboardEventAggregator _keyboard;
-        private readonly IEyetracker _eyetracker;
+        private readonly IKeyboardEventService _keyboard;
+        private readonly IEyetrackerService _eyetracker;
 
-        public GazeCaret(IWpfTextView textView, KeyboardEventAggregator keyboard, IEyetracker eyetracker)
+        public GazeCaret(IWpfTextView textView, IKeyboardEventService keyboard, IEyetrackerService eyetracker)
         {
             _textView = textView;
             _keyboard = keyboard;
             _eyetracker = eyetracker;
 
-            _keyboard.MoveCaret += OnCarretAction;
+            _textView.Closed += OnTextViewClosed;
+            _keyboard.MoveCaret += OnCaretAction;
         }
 
-        private void OnCarretAction()
+        private void OnTextViewClosed(object sender, EventArgs e)
         {
+            _keyboard.MoveCaret -= OnCaretAction;
+            _textView.Closed -= OnTextViewClosed;
+        }
+
+        private void OnCaretAction()
+        {
+            Logger.Log($"GazeCaret.OnCaretAction {_textView.HasAggregateFocus}");
+
+            // only move the caret in the focused window
+            if (!_textView.HasAggregateFocus) return;
+
             var elm = _textView.VisualElement;
             if (!_eyetracker.IsLookingAt(elm)) return;
 
-            var gazePoint = elm.GetRelativeGazePoint(_eyetracker);
+            var gazePoint = _eyetracker.GetRelativeGazePoint(elm);
             var gazePointInText = new Point(gazePoint.X + _textView.ViewportLeft, gazePoint.Y + _textView.ViewportTop);
             var verticalMargin = _textView.LineHeight * 3;
 
