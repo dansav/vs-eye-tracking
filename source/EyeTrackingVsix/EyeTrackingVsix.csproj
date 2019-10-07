@@ -77,16 +77,32 @@
       <DependentUpon>CaretOptionsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Options\Gui\CaretOptionsViewMdoel.cs" />
+    <Compile Include="Options\Gui\DynamicProfileView.xaml.cs">
+      <DependentUpon>DynamicProfileView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Gui\ExponentialProfileView.xaml.cs">
+      <DependentUpon>ExponentialProfileView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Options\Gui\GeneralOptionsView.xaml.cs">
       <DependentUpon>GeneralOptionsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Options\Gui\GeneralOptionsViewModel.cs" />
     <Compile Include="Options\Gui\InteractionKeyToTitleConverter.cs" />
+    <Compile Include="Options\Gui\KeyboardOptionsView.xaml.cs">
+      <DependentUpon>KeyboardOptionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Gui\LinearProfileView.xaml.cs">
+      <DependentUpon>LinearProfileView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Options\Gui\PropertyChangedBase.cs" />
     <Compile Include="Options\Gui\ScrollOptionsView.xaml.cs">
       <DependentUpon>ScrollOptionsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Options\Gui\ScrollOptionsViewModel.cs" />
+    <Compile Include="Options\Gui\ScrollTypeTemplateSelector.cs" />
+    <Compile Include="Options\Gui\StaticProfileView.xaml.cs">
+      <DependentUpon>StaticProfileView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Options\Gui\WindowFocusOptionsView.xaml.cs">
       <DependentUpon>WindowFocusOptionsView.xaml</DependentUpon>
     </Compile>
@@ -161,11 +177,35 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Options\Gui\DynamicProfileView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\Gui\ExponentialProfileView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Options\Gui\GeneralOptionsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Options\Gui\KeyboardOptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\Gui\LinearProfileView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Options\Gui\ScrollOptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\Gui\StaticProfileView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\Gui\Styles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

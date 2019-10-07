@@ -7,62 +7,91 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <local:InteractionKeyToTitleConverter x:Key="InteractionKeyConverter" />
-        <local:ScrollTypeToTitleConverter x:Key="ScrollTypeConverter" />
-        <Style x:Key="RadioButtonList" TargetType="{x:Type ListBox}">
-            <!-- ControlTemplate taken from MSDN http://msdn.microsoft.com/en-us/library/ms754242.aspx -->
-            <Setter Property="SnapsToDevicePixels" Value="true"/>
-            <Setter Property="OverridesDefaultStyle" Value="true"/>
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
-            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
-            <Setter Property="MinWidth" Value="120"/>
-            <Setter Property="MinHeight" Value="95"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ListBox">
-                        <Border Name="Border" Background="Transparent"
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <local:InteractionKeyToTitleConverter x:Key="InteractionKeyConverter" />
+            <local:ScrollTypeToTitleConverter x:Key="ScrollTypeConverter" />
+            <Style x:Key="RadioButtonList" TargetType="{x:Type ListBox}">
+                <!-- ControlTemplate taken from MSDN http://msdn.microsoft.com/en-us/library/ms754242.aspx -->
+                <Setter Property="SnapsToDevicePixels" Value="true"/>
+                <Setter Property="OverridesDefaultStyle" Value="true"/>
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+                <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+                <Setter Property="MinWidth" Value="120"/>
+                <Setter Property="MinHeight" Value="95"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBox">
+                            <Border Name="Border" Background="Transparent"
                         BorderBrush="Transparent"
                         BorderThickness="0"
                         CornerRadius="2">
-                            <ScrollViewer Margin="0" Focusable="false">
+                                <!--<ScrollViewer Margin="0" Focusable="false">-->
                                 <StackPanel Margin="2" IsItemsHost="True" />
-                            </ScrollViewer>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsEnabled" Value="false">
-                                <Setter TargetName="Border" Property="Background"
+                                <!--</ScrollViewer>-->
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter TargetName="Border" Property="Background"
                                 Value="Transparent" />
-                                <Setter TargetName="Border" Property="BorderBrush"
+                                    <Setter TargetName="Border" Property="BorderBrush"
                                 Value="Transparent" />
-                            </Trigger>
-                            <Trigger Property="IsGrouping" Value="true">
-                                <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="ItemContainerStyle">
-                <Setter.Value>
-                    <Style TargetType="{x:Type ListBoxItem}" >
-                        <Setter Property="Margin" Value="2" />
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                    <Border Name="theBorder" Background="Transparent">
-                                        <RadioButton Focusable="False" IsHitTestVisible="False"
+                                </Trigger>
+                                <Trigger Property="IsGrouping" Value="true">
+                                    <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style TargetType="{x:Type ListBoxItem}" >
+                            <Setter Property="Margin" Value="2" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                        <Border Name="theBorder" Background="Transparent">
+                                            <RadioButton Focusable="False" IsHitTestVisible="False"
                                              IsChecked="{TemplateBinding IsSelected}">
-                                            <ContentPresenter />
-                                        </RadioButton>
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </Setter.Value>
-            </Setter>
-        </Style>
+                                                <ContentPresenter />
+                                            </RadioButton>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <local:ScrollTypeTemplateSelector x:Key="ScrollTypeTemplateSelector">
+                <!--<local:ScrollTypeTemplateSelector.Static>
+                <DataTemplate>
+                    <local:StaticProfileView ParentContext="{Binding}" />
+                </DataTemplate>
+            </local:ScrollTypeTemplateSelector.Static>-->
+                <local:ScrollTypeTemplateSelector.Linear>
+                    <DataTemplate>
+                        <local:LinearProfileView ParentContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=local:ScrollOptionsView}}" />
+                    </DataTemplate>
+                </local:ScrollTypeTemplateSelector.Linear>
+                <local:ScrollTypeTemplateSelector.Exponential>
+                    <DataTemplate>
+                        <local:ExponentialProfileView ParentContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=local:ScrollOptionsView}}" />
+                    </DataTemplate>
+                </local:ScrollTypeTemplateSelector.Exponential>
+                <local:ScrollTypeTemplateSelector.Dynamic>
+                    <DataTemplate>
+                        <local:DynamicProfileView ParentContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=local:ScrollOptionsView}}" />
+                    </DataTemplate>
+                </local:ScrollTypeTemplateSelector.Dynamic>
+            </local:ScrollTypeTemplateSelector>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
         <GroupBox Header="Scroll">
@@ -70,7 +99,7 @@
                 <CheckBox IsChecked="{Binding Enabled}">Enabled</CheckBox>
                 <Border IsEnabled="{Binding Enabled}">
                     <StackPanel>
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Style="{StaticResource ContainerWithBottomMargin}">
                             <ComboBox ItemsSource="{Binding AvailableKeys}" SelectedValue="{Binding SelectedKey}" MinWidth="100">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
@@ -85,6 +114,7 @@
                         <ListBox
                             Style="{StaticResource RadioButtonList}"
                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                            ScrollViewer.VerticalScrollBarVisibility="Disabled"
                             ItemsSource="{Binding AvailableScrollProfiles}"
                             SelectedValue="{Binding SelectedProfile}"
                             >
@@ -97,6 +127,15 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
 
+                        <Border Margin="0 0 6 10">
+                            <local:StaticProfileView />
+                        </Border>
+
+                        <ContentControl
+                            Margin="0 0 6 10"
+                            ContentTemplateSelector="{StaticResource ScrollTypeTemplateSelector}"
+                            Content="{Binding SelectedProfile}"
+                            />
 
                     </StackPanel>
                 </Border>

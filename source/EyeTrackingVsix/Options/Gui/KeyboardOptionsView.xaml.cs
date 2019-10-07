@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -15,11 +16,11 @@ using System.Windows.Shapes;
 namespace EyeTrackingVsix.Options.Gui
 {
     /// <summary>
-    /// Interaction logic for ScrollOptionsView.xaml
+    /// Interaction logic for KeyboardOptionsView.xaml
     /// </summary>
-    public partial class ScrollOptionsView : UserControl
+    public partial class KeyboardOptionsView : UserControl
     {
-        public ScrollOptionsView()
+        public KeyboardOptionsView()
         {
             InitializeComponent();
         }

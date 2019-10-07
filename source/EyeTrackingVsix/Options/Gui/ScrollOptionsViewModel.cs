@@ -53,5 +53,45 @@ namespace EyeTrackingVsix.Options.Gui
                 OnPropertyChanged();
             }
         }
+
+        public int Velocity
+        {
+            get => _model.ScrollVelocity;
+            set
+            {
+                _model.ScrollVelocity = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double LinearAccelerationTime
+        {
+            get => _model.ScrollLinearAccelerationTime;
+            set
+            {
+                _model.ScrollLinearAccelerationTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double ExponentialAcceleration
+        {
+            get => _model.ScrollExponentialAccelerationPower;
+            set
+            {
+                _model.ScrollExponentialAccelerationPower = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double ExponentialInertia
+        {
+            get => _model.ScrollExponentialInertia;
+            set
+            {
+                _model.ScrollExponentialInertia = value;
+                OnPropertyChanged();
+            }
+        }
     }
 }

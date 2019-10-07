@@ -7,11 +7,19 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance local:GeneralOptionsViewModel, IsDesignTimeCreatable=False}"
              d:DesignWidth="500" d:DesignHeight="700">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <ScrollViewer>
         <StackPanel>
             <local:CaretOptionsView DataContext="{Binding Caret}" />
-            <local:ScrollOptionsView DataContext="{Binding Scroll}" />
             <local:WindowFocusOptionsView DataContext="{Binding WindowFocus}" />
+            <local:ScrollOptionsView DataContext="{Binding Scroll}" />
+            <local:KeyboardOptionsView />
         </StackPanel>
     </ScrollViewer>
 </UserControl>

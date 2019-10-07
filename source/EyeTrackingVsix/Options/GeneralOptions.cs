@@ -70,7 +70,7 @@ namespace EyeTrackingVsix.Options
         
         [Category("Scroll")]
         [DisplayName("Scroll velocity (pixels per second)")]
-        [Description("Select the key on the keyboard that will be used to trigger a scroll.")]
+        [Description("The base velocity. This is how fast the document will scroll on the screen.")]
         [DefaultValue(400)]
         public int ScrollVelocity { get; set; } = 800;
 

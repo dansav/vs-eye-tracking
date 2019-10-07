@@ -7,14 +7,19 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <local:InteractionKeyToTitleConverter x:Key="InteractionKeyConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <local:InteractionKeyToTitleConverter x:Key="InteractionKeyConverter" />
+        </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
-        <GroupBox Header="Caret" >
+        <GroupBox Header="Caret" Margin="0 0 6 6" Padding="4 6">
             <StackPanel>
                 <CheckBox IsChecked="{Binding Enabled}">Enabled</CheckBox>
                 <Border IsEnabled="{Binding Enabled}">
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel >
                         <ComboBox ItemsSource="{Binding AvailableKeys}" SelectedValue="{Binding SelectedKey}" MinWidth="100">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
