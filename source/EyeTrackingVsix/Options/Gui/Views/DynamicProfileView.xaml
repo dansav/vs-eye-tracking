@@ -1,0 +1,28 @@
+﻿<UserControl x:Class="EyeTrackingVsix.Options.Gui.Views.DynamicProfileView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             DataContext="{Binding RelativeSource={RelativeSource Self}, Path=ParentContext}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <StackPanel>
+        <TextBlock>Dynamic velocity curve</TextBlock>
+        <ComboBox ItemsSource="{Binding AvailableVelocityCurves}" SelectedValue="{Binding SelectedVelocityCurve}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding .}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <TextBlock TextWrapping="Wrap">Select from different velocity curves. The curves have different behaviour depending on how close to vertical center of the window you are looking.</TextBlock>
+    </StackPanel>
+</UserControl>

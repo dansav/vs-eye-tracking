@@ -2,27 +2,27 @@
 
 namespace EyeTrackingVsix.Options
 {
-    internal abstract class OptionPageBase<T> : DialogPage where T : OptionModelBase<T>, new()
+    internal abstract class OptionPageBase<T> : UIElementDialogPage where T : OptionModelBase<T>, new()
     {
-        private readonly OptionModelBase<T> _model;
+        protected readonly T Model;
 
-        public OptionPageBase()
+        protected OptionPageBase()
         {
 #pragma warning disable VSTHRD104 // Offer async methods
-            _model = ThreadHelper.JoinableTaskFactory.Run(OptionModelBase<T>.CreateAsync);
+            Model = ThreadHelper.JoinableTaskFactory.Run(OptionModelBase<T>.CreateAsync);
 #pragma warning restore VSTHRD104 // Offer async methods
         }
 
-        public override object AutomationObject => _model;
+        public override object AutomationObject => Model;
 
         public override void LoadSettingsFromStorage()
         {
-            _model.Load();
+            Model.Load();
         }
 
         public override void SaveSettingsToStorage()
         {
-            _model.Save();
+            Model.Save();
         }
     }
 }

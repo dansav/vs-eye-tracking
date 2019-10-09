@@ -1,4 +1,5 @@
-﻿using EyeTrackingVsix.Common.Configuration;
+﻿using System;
+using EyeTrackingVsix.Common.Configuration;
 
 namespace EyeTrackingVsix.Features.Scroll
 {
@@ -7,6 +8,7 @@ namespace EyeTrackingVsix.Features.Scroll
         private readonly IScrollSettings _settings;
 
         private IRelativeGazeTransformer _relativeGaze;
+        private VelocityCurve _curve;
 
         public DynamicVelocityProvider(IScrollSettings settings)
         {
@@ -20,6 +22,7 @@ namespace EyeTrackingVsix.Features.Scroll
         public void Start(IRelativeGazeTransformer relativeGaze)
         {
             _relativeGaze = relativeGaze;
+            _curve = _settings.DynamicVelocityCurve;
         }
 
         public void Stop()
@@ -31,17 +34,27 @@ namespace EyeTrackingVsix.Features.Scroll
         {
             var verticalOffset = _relativeGaze.NormalizedOffset.Y;
 
-            // apply Quadratic easing
-            //verticalOffset = Math.Sign(verticalOffset) * (verticalOffset * verticalOffset);
-
-            // apply sine easing
-            //verticalOffset = 0.5 * Math.Sign(verticalOffset) * (1 - Math.Cos(Math.PI * verticalOffset));
-
-            // apply cubic easing
-            verticalOffset = verticalOffset * verticalOffset * verticalOffset;
-
             // visualization of the curves: https://www.desmos.com/calculator/x8us9obuu0
-            //TODO: allow user to select easing
+            switch (_curve)
+            {
+                case VelocityCurve.Linear:
+                    // nothing to do...
+                    break;
+                case VelocityCurve.Quadratic:
+                    // apply Quadratic curve
+                    verticalOffset = Math.Sign(verticalOffset) * (verticalOffset * verticalOffset);
+                    break;
+                case VelocityCurve.Sine:
+                    // apply sine curve
+                    verticalOffset = 0.5 * Math.Sign(verticalOffset) * (1 - Math.Cos(Math.PI * verticalOffset));
+                    break;
+                case VelocityCurve.Cubic:
+                    // apply cubic curve
+                    verticalOffset = verticalOffset * verticalOffset * verticalOffset;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
 
             return _settings.Velocity * verticalOffset;
         }

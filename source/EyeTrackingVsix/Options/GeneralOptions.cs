@@ -70,7 +70,7 @@ namespace EyeTrackingVsix.Options
         
         [Category("Scroll")]
         [DisplayName("Scroll velocity (pixels per second)")]
-        [Description("Select the key on the keyboard that will be used to trigger a scroll.")]
+        [Description("The base velocity. This is how fast the document will scroll on the screen.")]
         [DefaultValue(400)]
         public int ScrollVelocity { get; set; } = 800;
 
@@ -91,6 +91,12 @@ namespace EyeTrackingVsix.Options
         [Description("A higher number breaks to no scroll faster. Reccomended values: between 0.001 and 0.05. (only applicable if Exponential scroll type is selected)")]
         [DefaultValue(0.025)]
         public double ScrollExponentialInertia { get; set; } = 0.025;
+
+        [Category("Scroll")]
+        [DisplayName("Scroll velocity: Dynamic scroll curve (experimental)")]
+        [Description("Select from different velocity curves. The curves have different behaviour depending on how close to vertical center of the window you are looking. (only applicable if Dynamic scroll type is selected)")]
+        [DefaultValue(VelocityCurve.Cubic)]
+        public VelocityCurve ScrollDynamicCurve { get; set; } = VelocityCurve.Cubic;
 
         // --------------------------------------------------------------------
 
