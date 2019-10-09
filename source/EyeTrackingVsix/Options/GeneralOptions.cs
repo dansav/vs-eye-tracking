@@ -92,6 +92,12 @@ namespace EyeTrackingVsix.Options
         [DefaultValue(0.025)]
         public double ScrollExponentialInertia { get; set; } = 0.025;
 
+        [Category("Scroll")]
+        [DisplayName("Scroll velocity: Dynamic scroll curve (experimental)")]
+        [Description("Select from different velocity curves. The curves have different behaviour depending on how close to vertical center of the window you are looking. (only applicable if Dynamic scroll type is selected)")]
+        [DefaultValue(VelocityCurve.Cubic)]
+        public VelocityCurve ScrollDynamicCurve { get; set; } = VelocityCurve.Cubic;
+
         // --------------------------------------------------------------------
 
         public event Action GeneralOptionsChanged;

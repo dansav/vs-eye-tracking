@@ -4,7 +4,7 @@ using System.Linq;
 using EyeTrackingVsix.Common.Keyboard;
 using EyeTrackingVsix.Features.Scroll;
 
-namespace EyeTrackingVsix.Options.Gui
+namespace EyeTrackingVsix.Options.Gui.ViewModels
 {
     public class ScrollOptionsViewModel : PropertyChangedBase
     {
@@ -21,6 +21,11 @@ namespace EyeTrackingVsix.Options.Gui
             AvailableScrollProfiles = Enum
                 .GetValues(typeof(ScrollType))
                 .Cast<ScrollType>()
+                .ToArray();
+
+            AvailableVelocityCurves = Enum
+                .GetValues(typeof(VelocityCurve))
+                .Cast<VelocityCurve>()
                 .ToArray();
         }
 
@@ -90,6 +95,18 @@ namespace EyeTrackingVsix.Options.Gui
             set
             {
                 _model.ScrollExponentialInertia = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public IEnumerable<VelocityCurve> AvailableVelocityCurves { get; }
+
+        public VelocityCurve SelectedVelocityCurve
+        {
+            get => _model.ScrollDynamicCurve;
+            set
+            {
+                _model.ScrollDynamicCurve = value;
                 OnPropertyChanged();
             }
         }

@@ -1,15 +1,17 @@
-﻿<UserControl x:Class="EyeTrackingVsix.Options.Gui.ScrollOptionsView"
+﻿<UserControl x:Class="EyeTrackingVsix.Options.Gui.Views.ScrollOptionsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:EyeTrackingVsix.Options.Gui"
+             xmlns:viewModels="clr-namespace:EyeTrackingVsix.Options.Gui.ViewModels"
+             xmlns:views="clr-namespace:EyeTrackingVsix.Options.Gui.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Styles.xaml"/>
+                <ResourceDictionary Source="../Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <local:InteractionKeyToTitleConverter x:Key="InteractionKeyConverter" />
@@ -26,20 +28,18 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ListBox">
-                            <Border Name="Border" Background="Transparent"
-                        BorderBrush="Transparent"
-                        BorderThickness="0"
-                        CornerRadius="2">
-                                <!--<ScrollViewer Margin="0" Focusable="false">-->
+                            <Border
+                                Name="Border"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                BorderThickness="0"
+                                CornerRadius="2">
                                 <StackPanel Margin="2" IsItemsHost="True" />
-                                <!--</ScrollViewer>-->
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsEnabled" Value="false">
-                                    <Setter TargetName="Border" Property="Background"
-                                Value="Transparent" />
-                                    <Setter TargetName="Border" Property="BorderBrush"
-                                Value="Transparent" />
+                                    <Setter TargetName="Border" Property="Background" Value="Transparent" />
+                                    <Setter TargetName="Border" Property="BorderBrush" Value="Transparent" />
                                 </Trigger>
                                 <Trigger Property="IsGrouping" Value="true">
                                     <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
@@ -56,8 +56,7 @@
                                 <Setter.Value>
                                     <ControlTemplate TargetType="{x:Type ListBoxItem}">
                                         <Border Name="theBorder" Background="Transparent">
-                                            <RadioButton Focusable="False" IsHitTestVisible="False"
-                                             IsChecked="{TemplateBinding IsSelected}">
+                                            <RadioButton Focusable="False" IsHitTestVisible="False" IsChecked="{TemplateBinding IsSelected}">
                                                 <ContentPresenter />
                                             </RadioButton>
                                         </Border>
@@ -69,28 +68,23 @@
                 </Setter>
             </Style>
 
-            <local:ScrollTypeTemplateSelector x:Key="ScrollTypeTemplateSelector">
-                <!--<local:ScrollTypeTemplateSelector.Static>
-                <DataTemplate>
-                    <local:StaticProfileView ParentContext="{Binding}" />
-                </DataTemplate>
-            </local:ScrollTypeTemplateSelector.Static>-->
-                <local:ScrollTypeTemplateSelector.Linear>
+            <viewModels:ScrollTypeTemplateSelector x:Key="ScrollTypeTemplateSelector">
+                <viewModels:ScrollTypeTemplateSelector.Linear>
                     <DataTemplate>
-                        <local:LinearProfileView ParentContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=local:ScrollOptionsView}}" />
+                        <views:LinearProfileView ParentContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=views:ScrollOptionsView}}" />
                     </DataTemplate>
-                </local:ScrollTypeTemplateSelector.Linear>
-                <local:ScrollTypeTemplateSelector.Exponential>
+                </viewModels:ScrollTypeTemplateSelector.Linear>
+                <viewModels:ScrollTypeTemplateSelector.Exponential>
                     <DataTemplate>
-                        <local:ExponentialProfileView ParentContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=local:ScrollOptionsView}}" />
+                        <views:ExponentialProfileView ParentContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=views:ScrollOptionsView}}" />
                     </DataTemplate>
-                </local:ScrollTypeTemplateSelector.Exponential>
-                <local:ScrollTypeTemplateSelector.Dynamic>
+                </viewModels:ScrollTypeTemplateSelector.Exponential>
+                <viewModels:ScrollTypeTemplateSelector.Dynamic>
                     <DataTemplate>
-                        <local:DynamicProfileView ParentContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=local:ScrollOptionsView}}" />
+                        <views:DynamicProfileView ParentContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=views:ScrollOptionsView}}" />
                     </DataTemplate>
-                </local:ScrollTypeTemplateSelector.Dynamic>
-            </local:ScrollTypeTemplateSelector>
+                </viewModels:ScrollTypeTemplateSelector.Dynamic>
+            </viewModels:ScrollTypeTemplateSelector>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -103,36 +97,38 @@
                             <ComboBox ItemsSource="{Binding AvailableKeys}" SelectedValue="{Binding SelectedKey}" MinWidth="100">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding ., Converter={StaticResource InteractionKeyConverter}}"></TextBlock>
+                                        <TextBlock Text="{Binding ., Converter={StaticResource InteractionKeyConverter}}" />
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
-                            <TextBlock>By double tapping, and holding this key...</TextBlock>
+                            <TextBlock TextWrapping="Wrap">
+                                By double tapping, and holding the selected key the document you are looking at will start to scroll.
+                                The scroll behaviour can be tweaked below.
+                            </TextBlock>
+                            <TextBlock Margin="0 8 0 0" FontStyle="Italic" TextWrapping="Wrap">
+                                Note: this feature will not change which window is focused.
+                                It is still possible to scroll in a window that is not the focused window.
+                            </TextBlock>
                         </StackPanel>
 
                         <TextBlock Text="Select the scroll profile you like:" />
                         <ListBox
                             Style="{StaticResource RadioButtonList}"
-                            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                            ScrollViewer.VerticalScrollBarVisibility="Disabled"
                             ItemsSource="{Binding AvailableScrollProfiles}"
-                            SelectedValue="{Binding SelectedProfile}"
-                            >
+                            SelectedValue="{Binding SelectedProfile}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock
-                                        TextWrapping="Wrap"
-                                        Text="{Binding ., Converter={StaticResource ScrollTypeConverter}}" />
+                                    <TextBlock TextWrapping="Wrap" Text="{Binding ., Converter={StaticResource ScrollTypeConverter}}" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
 
-                        <Border Margin="0 0 6 10">
-                            <local:StaticProfileView />
+                        <Border Margin="0 10 0 0">
+                            <views:StaticProfileView />
                         </Border>
 
                         <ContentControl
-                            Margin="0 0 6 10"
+                            Margin="0 10 0 0"
                             ContentTemplateSelector="{StaticResource ScrollTypeTemplateSelector}"
                             Content="{Binding SelectedProfile}"
                             />

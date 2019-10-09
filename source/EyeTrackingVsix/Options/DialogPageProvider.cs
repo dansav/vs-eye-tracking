@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 using EyeTrackingVsix.Options.Gui;
+using EyeTrackingVsix.Options.Gui.ViewModels;
+using GeneralOptionsView = EyeTrackingVsix.Options.Gui.Views.GeneralOptionsView;
 
 namespace EyeTrackingVsix.Options
 {

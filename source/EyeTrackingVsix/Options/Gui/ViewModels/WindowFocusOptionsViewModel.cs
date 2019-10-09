@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using EyeTrackingVsix.Common.Keyboard;
 
-namespace EyeTrackingVsix.Options.Gui
+namespace EyeTrackingVsix.Options.Gui.ViewModels
 {
-    public class CaretOptionsViewMdoel : PropertyChangedBase
+    public class WindowFocusOptionsViewModel : PropertyChangedBase
     {
         private readonly GeneralOptions _model;
 
-        internal CaretOptionsViewMdoel(GeneralOptions model)
+        internal WindowFocusOptionsViewModel(GeneralOptions model)
         {
             _model = model;
             AvailableKeys = Enum
@@ -20,10 +20,10 @@ namespace EyeTrackingVsix.Options.Gui
 
         public bool Enabled
         {
-            get => _model.CaretEnabled;
+            get => _model.WindowFocusEnabled;
             set
             {
-                _model.CaretEnabled = value;
+                _model.WindowFocusEnabled = value;
                 OnPropertyChanged();
             }
         }

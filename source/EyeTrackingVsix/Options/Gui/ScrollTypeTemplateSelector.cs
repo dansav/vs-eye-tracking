@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using EyeTrackingVsix.Features.Scroll;
 
-namespace EyeTrackingVsix.Options.Gui
+namespace EyeTrackingVsix.Options.Gui.ViewModels
 {
     public class ScrollTypeTemplateSelector : DataTemplateSelector
     {

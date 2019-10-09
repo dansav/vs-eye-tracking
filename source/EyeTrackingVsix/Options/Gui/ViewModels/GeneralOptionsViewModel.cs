@@ -1,4 +1,4 @@
-﻿namespace EyeTrackingVsix.Options.Gui
+﻿namespace EyeTrackingVsix.Options.Gui.ViewModels
 {
     public class GeneralOptionsViewModel : PropertyChangedBase
     {
@@ -7,12 +7,12 @@
         internal GeneralOptionsViewModel(GeneralOptions model)
         {
             _model = model;
-            Caret = new CaretOptionsViewMdoel(model);
+            Caret = new CaretOptionsViewModel(model);
             Scroll = new ScrollOptionsViewModel(model);
             WindowFocus = new WindowFocusOptionsViewModel(model);
         }
 
-        public CaretOptionsViewMdoel Caret { get; }
+        public CaretOptionsViewModel Caret { get; }
         public ScrollOptionsViewModel Scroll { get; }
         public WindowFocusOptionsViewModel WindowFocus { get; }
 

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="EyeTrackingVsix.Options.Gui.WindowFocusOptionsView"
+﻿<UserControl x:Class="EyeTrackingVsix.Options.Gui.Views.WindowFocusOptionsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -14,7 +14,7 @@
             <StackPanel>
                 <CheckBox IsChecked="{Binding Enabled}">Enabled</CheckBox>
                 <Border IsEnabled="{Binding Enabled}">
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel>
                         <!--<ComboBox ItemsSource="{Binding AvailableKeys}" SelectedValue="{Binding SelectedKey}" MinWidth="100">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
@@ -22,7 +22,12 @@
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>-->
-                        <TextBlock>Note: currently this feature uses the same key as the Caret feature.</TextBlock>
+                        <TextBlock Margin="0 8" FontStyle="Italic">Note: currently this feature uses the same key as the Caret feature.</TextBlock>
+
+                        <TextBlock TextWrapping="Wrap">
+                            By double tapping the selected key, the window where you look will get focus.
+                        </TextBlock>
+
                     </StackPanel>
                 </Border>
             </StackPanel>
