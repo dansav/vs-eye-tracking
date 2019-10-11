@@ -19,6 +19,8 @@ All features can be enabled or disabled. Some features has more parameters that 
 
     Tools -> Options... -> Eye tracking
 
+![Options GUI](docs/options_gui.png)
+
 ## Features
 
 All features are a based on what you can do with your keyboard when it is augmented by the input from an eye tracker.
@@ -29,7 +31,7 @@ Keyboard: Double-tap and hold the right Ctrl-key
 
 Basic scrolling. While holding down the Ctrl-key the document will scroll. If your gaze was directed in the upper half of the editor view, the scroll direction is up. If your gaze is directed to the lower half of the editur view, the scroll direction is down.
 
-In version 0.3.0 it is possible to select different profiles for the scroll velocity.
+Since version 0.3.0 it is possible to select different profiles for the scroll velocity.
 
 In Visual Studio, goto Tools -> Options... -> Eye tracking.
 
