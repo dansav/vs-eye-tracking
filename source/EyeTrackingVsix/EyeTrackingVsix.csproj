@@ -49,6 +49,9 @@
     <Compile Include="..\..\output\AssemblyVersion.generated.cs">
       <Link>Properties\AssemblyVersion.generated.cs</Link>
     </Compile>
+    <Compile Include="Features\Scroll\ScrollType.cs" />
+    <Compile Include="Features\Scroll\VelocityCurve.cs" />
+    <Compile Include="Features\Scroll\VelocityProviderFactory.cs" />
     <Compile Include="Features\WindowFocus\DteWindowExtensions.cs" />
     <Compile Include="Features\Scroll\CenterOfElementGazeTransformer.cs" />
     <Compile Include="Features\Scroll\DynamicVelocityProvider.cs" />
@@ -73,6 +76,40 @@
     <Compile Include="Options\DialogPageProvider.cs" />
     <Compile Include="Options\GeneralOptions.cs" />
     <Compile Include="Common\Keyboard\InteractionKey.cs" />
+    <Compile Include="Options\Gui\Views\CaretOptionsView.xaml.cs">
+      <DependentUpon>CaretOptionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Gui\ViewModels\CaretOptionsViewModel.cs" />
+    <Compile Include="Options\Gui\Views\DynamicProfileView.xaml.cs">
+      <DependentUpon>DynamicProfileView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Gui\Views\ExponentialProfileView.xaml.cs">
+      <DependentUpon>ExponentialProfileView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Gui\Views\GeneralOptionsView.xaml.cs">
+      <DependentUpon>GeneralOptionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Gui\ViewModels\GeneralOptionsViewModel.cs" />
+    <Compile Include="Options\Gui\InteractionKeyToTitleConverter.cs" />
+    <Compile Include="Options\Gui\Views\KeyboardOptionsView.xaml.cs">
+      <DependentUpon>KeyboardOptionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Gui\Views\LinearProfileView.xaml.cs">
+      <DependentUpon>LinearProfileView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Gui\PropertyChangedBase.cs" />
+    <Compile Include="Options\Gui\Views\ScrollOptionsView.xaml.cs">
+      <DependentUpon>ScrollOptionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Gui\ViewModels\ScrollOptionsViewModel.cs" />
+    <Compile Include="Options\Gui\ScrollTypeTemplateSelector.cs" />
+    <Compile Include="Options\Gui\Views\StaticProfileView.xaml.cs">
+      <DependentUpon>StaticProfileView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Gui\Views\WindowFocusOptionsView.xaml.cs">
+      <DependentUpon>WindowFocusOptionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Gui\ViewModels\WindowFocusOptionsViewModel.cs" />
     <Compile Include="Options\OptionModelBase.cs" />
     <Compile Include="Options\OptionPageBase.cs">
       <SubType>Component</SubType>
@@ -126,7 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CoroutinesForWpf">
-      <Version>0.1.0-beta0001</Version>
+      <Version>0.2.0</Version>
     </PackageReference>
     <PackageReference Include="Eyetracking.NET">
       <Version>3.0.0</Version>
@@ -138,6 +175,48 @@
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.0.2264" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Page Include="Options\Gui\Views\CaretOptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\Gui\Views\DynamicProfileView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\Gui\Views\ExponentialProfileView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\Gui\Views\GeneralOptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\Gui\Views\KeyboardOptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\Gui\Views\LinearProfileView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\Gui\Views\ScrollOptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\Gui\Views\StaticProfileView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\Gui\Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Options\Gui\Views\WindowFocusOptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup>

@@ -59,7 +59,7 @@ namespace EyeTrackingVsix.Features.Scroll
 
             if (!relativeGaze.HasGaze) return;
 
-            Executor.StartCoroutine(DoScroll());
+            Coroutine.Start(DoScroll());
 
             _timestamp = DateTime.Now;
             _velocityProvider.Start(relativeGaze);

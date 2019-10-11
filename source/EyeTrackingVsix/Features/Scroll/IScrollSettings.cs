@@ -11,5 +11,7 @@ namespace EyeTrackingVsix.Common.Configuration
         double ExponentialPower { get; }
 
         double ExponentialInertia { get; }
+
+        VelocityCurve DynamicVelocityCurve { get; }
     }
 }
