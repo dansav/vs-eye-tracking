@@ -15,9 +15,11 @@ See the [change log](CHANGELOG.md) for changes and road map.
 
 ## Configuration
 
-All features can be enabled or disabled. Some features has more parameters that can be tweaked. All options are available under the VIsual Studio tools menu.
+All features can be enabled or disabled. Some features have more parameters that can be tweaked. All options are available under the Visual Studio tools menu.
 
     Tools -> Options... -> Eye tracking
+
+![Options GUI](docs/options_gui.png)
 
 ## Features
 
@@ -25,24 +27,24 @@ All features are a based on what you can do with your keyboard when it is augmen
 
 ### Scrolling
 
-Keyboard: Double-tap and hold the right Ctrl-key
+Keyboard: Double-tap and hold the right Ctrl-key (key is configurable)
 
-Basic scrolling. While holding down the Ctrl-key the document will scroll. If your gaze was directed in the upper half of the editor view, the scroll direction is up. If your gaze is directed to the lower half of the editur view, the scroll direction is down.
+Basic scrolling. While holding down the Ctrl-key, the document will scroll.
+Depending on which scroll profile is selected, the scroll will behave slightly different.
 
-In version 0.3.0 it is possible to select different profiles for the scroll velocity.
+ For all profiles except _Dynamic_  the base functionality is, if you looked in the upper half of the editor view when double tapping the key, the scroll direction is up.
+ And when you look in the lower half of the editor view, the scroll direction is down.
 
-In Visual Studio, goto Tools -> Options... -> Eye tracking.
+These are the available scroll profiles:
 
-There you will find three differnt scroll types:
-
-- _Static_: with no fancy acceleration/deacceleration just a constant scroll speed.
+- _Static_: with no fancy acceleration/de-acceleration just a constant scroll speed.
 - _Linear_: You can specify how long it will take to accelerate to max scroll speed.
 - _Exponential_: Has both acceleration and deacceleration (inertial).
-- _Dynamic_: Continously modifies the scroll speed depending on distance to the vertical center of the document window.
+- _Dynamic_: Continuously modifies the scroll speed, and direction, depending on distance between your current gaze point and the vertical center of the document window.
 
 ### Move caret
 
-Keyboard: Double-tap (and release) the right Ctrl-key
+Keyboard: Double-tap (and release) the right Ctrl-key (key is configurable)
 
 Basic way of moving the caret to where you look.
 
@@ -50,4 +52,4 @@ Basic way of moving the caret to where you look.
 
 Keyboard: (currently shares the same command as Move caret)
 
-Will set the window you look at as the active/focused window. This only applies to Visual Studio windows. A Visual Studio window can be free floating or docked in a window frame set. Supported windows include Document windows (usually code files) and Tool windows (Solution Explorer Output, Team Explorer etc).
+Will set the window you look at as the active/focused window. This only applies to Visual Studio windows. A Visual Studio window can be free floating or docked in a window frame set. Supported windows include Document windows (usually code files) and Tool windows (Solution Explorer Output, Team Explorer etc.).
