@@ -20,12 +20,14 @@ namespace EyeTrackingVsix
     {
         private readonly IEyetrackerService _eyetracker;
         private readonly IKeyboardEventService _keyboardService;
+        private readonly IScrollVelocityService _scrollVelocityService;
 
         [ImportingConstructor]
         public WpfTextViewListener(SVsServiceProvider serviceProvider)
         {
             _eyetracker =  (IEyetrackerService)serviceProvider.GetService(typeof(SEyetrackerService));
             _keyboardService = (IKeyboardEventService)serviceProvider.GetService(typeof(SKeyboardEventService));
+            _scrollVelocityService = (IScrollVelocityService)serviceProvider.GetService(typeof(SScrollVelocityService));
         }
 
         /// <summary>
@@ -42,10 +44,7 @@ namespace EyeTrackingVsix
 
             if (GeneralOptions.Instance.ScrollEnabled)
             {
-                // TODO: make it possible to switch velocity provider in an open document
-                // NOTE: currently each open document will keep its velocity provider until the document is closed
-                var velocityProvider = VelocityProviderFactory.Create(GeneralOptions.Instance.ScrollType);
-                new GazeScroll(textView, _keyboardService, _eyetracker, velocityProvider);
+                new GazeScroll(textView, _keyboardService, _eyetracker, _scrollVelocityService);
             }
 
             if (GeneralOptions.Instance.CaretEnabled)

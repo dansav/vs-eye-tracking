@@ -119,6 +119,7 @@
     <Compile Include="Common\ScrollRequest.cs" />
     <Compile Include="Services\EyetrackerService.cs" />
     <Compile Include="Services\KeyboardEventService.cs" />
+    <Compile Include="Services\ScrollVelocityService.cs" />
     <Compile Include="Utils\Logger.cs" />
     <Compile Include="WpfTextViewListener.cs" />
   </ItemGroup>
