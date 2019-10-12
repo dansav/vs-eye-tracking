@@ -32,12 +32,12 @@ Keyboard: Double-tap and hold the right Ctrl-key (key is configurable)
 Basic scrolling. While holding down the Ctrl-key, the document will scroll.
 Depending on which scroll profile is selected, the scroll will behave slightly different.
 
- For all profiles except _Dynamic_  the base functionality is, if you looked in the upper half of the editor view when double tapping the key, the scroll direction is up.
- And when you look in the lower half of the editor view, the scroll direction is down.
+For all profiles except _Dynamic_ the base functionality is, if you looked in the upper half of the editor view when double tapping the key, the scroll direction is up.
+And when you look in the lower half of the editor view, the scroll direction is down.
 
 These are the available scroll profiles:
 
-- _Static_: with no fancy acceleration/de-acceleration just a constant scroll speed.
+- _Static_: with no fancy acceleration/deacceleration just a constant scroll speed.
 - _Linear_: You can specify how long it will take to accelerate to max scroll speed.
 - _Exponential_: Has both acceleration and deacceleration (inertial).
 - _Dynamic_: Continuously modifies the scroll speed, and direction, depending on distance between your current gaze point and the vertical center of the document window.

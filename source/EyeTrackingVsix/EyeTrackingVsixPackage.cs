@@ -1,11 +1,8 @@
 ﻿using System;
-using System.ComponentModel.Design;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using EnvDTE;
-using EyeTrackingVsix.Common;
 using EyeTrackingVsix.Options;
 using EyeTrackingVsix.Services;
 using EyeTrackingVsix.Utils;
@@ -38,6 +35,7 @@ namespace EyeTrackingVsix
     [ProvideOptionPage(typeof(DialogPageProvider.General), "Eye tracking", "General", 0, 0, true)]
     [ProvideService(typeof(SEyetrackerService), IsAsyncQueryable = true)]
     [ProvideService(typeof(SKeyboardEventService), IsAsyncQueryable = true)]
+    [ProvideService(typeof(SScrollVelocityService), IsAsyncQueryable = true)]
     [Guid(PackageGuidString)]
     public sealed class EyeTrackingVsixPackage : AsyncPackage
     {
@@ -46,15 +44,9 @@ namespace EyeTrackingVsix
         /// </summary>
         public const string PackageGuidString = "30e9100a-2ae9-4ce5-a1d3-d5d9ae4057e7";
 
-        private static EyeTrackingVsixPackage _instance;
-
         private KeyboardEventService _keyboardEventService;
         private EyetrackerService _eyetrackerService;
-
-        public static object GetMyService(Type t)
-        {
-            return _instance.GetService(t);
-        }
+        private ScrollVelocityService _scrollVelocityService;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -65,10 +57,9 @@ namespace EyeTrackingVsix
         /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            _instance = this;
-
             AddService(typeof(SEyetrackerService), CreateServiceAsync, true);
             AddService(typeof(SKeyboardEventService), CreateServiceAsync, true);
+            AddService(typeof(SScrollVelocityService), CreateServiceAsync, true);
 
             // When initialized asynchronously, the current thread may be a background thread at this point.
             // Do any initialization that requires the UI thread after switching to the UI thread.
@@ -80,6 +71,7 @@ namespace EyeTrackingVsix
             {
                 _eyetrackerService = new EyetrackerService(this);
                 _keyboardEventService = new KeyboardEventService(this, System.Windows.Input.InputManager.Current, GeneralOptions.Instance);
+                _scrollVelocityService = new ScrollVelocityService(this);
 
                 new FocusableWindowManager(shell, dte.Events.WindowEvents, _eyetrackerService, _keyboardEventService);
             }
@@ -95,6 +87,11 @@ namespace EyeTrackingVsix
             if (serviceType == typeof(SKeyboardEventService))
             {
                 return Task.FromResult((object)_keyboardEventService);
+            }
+
+            if (serviceType == typeof(SScrollVelocityService))
+            {
+                return Task.FromResult((object)_scrollVelocityService);
             }
 
             // ???
