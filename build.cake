@@ -188,11 +188,18 @@ Task("Publish.UploadToVisualStudioMarketplace")
 
     if (string.IsNullOrEmpty(token))
     {
+        Error("Could not access PAT for publishing on VS Marketplace");
         throw new Exception("Could not access PAT for publishing on VS Marketplace");
     }
 
     var installationPath = VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.VisualStudio.Component.VSSDK" });
     var publisherPath = installationPath + File("/VSSDK/VisualStudioIntegration/Tools/Bin/VsixPublisher.exe");
+
+    if (!FileExists(publisherPath))
+    {
+        Error("Could not find VsixPublisher.exe");
+    }
+
     var exitCode = StartProcess(publisherPath,  new ProcessSettings
     {
         Arguments = $"publish -payload {file} -publishManifest {manifest} -personalAccessToken {token}"
