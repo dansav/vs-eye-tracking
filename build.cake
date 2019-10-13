@@ -149,8 +149,35 @@ Task("Publish.UploadToVsixGallery")
     Information("Done!");
 });
 
+Task("Publish.PreProcessReadmeFile").Does(() => 
+{
+    var filter = new TextLineFilter(new []
+    {
+        "",
+        "^#",
+        "^## Status",
+        "^#",
+    });
+
+    var readme = System.IO.File.OpenRead(MakeAbsolute(File("README.md")).FullPath);
+    var readmeCopy = System.IO.File.Create(MakeAbsolute(outputDir + File("README.md")).FullPath);
+    using (var reader = new StreamReader(readme))
+    using (var writer = new StreamWriter(readmeCopy))
+    {
+        while (!reader.EndOfStream)
+        {
+            var line = reader.ReadLine();
+            if (filter.CanWrite(line))
+            {
+                writer.WriteLine(line);
+            }
+        }
+    }
+});
+
 Task("Publish.UploadToVisualStudioMarketplace")
     .WithCriteria(() => version.BranchName == "master" && !BuildSystem.IsLocalBuild && !BuildSystem.IsPullRequest)
+    .IsDependentOn("Publish.PreProcessReadmeFile")
     .Does(() => 
 {
     var manifest = sourceDir + File("extension-manifest.json");
@@ -194,3 +221,33 @@ Task("Default")
 //////////////////////////////////////////////////////////////////////
 
 RunTarget(target);
+
+public class TextLineFilter
+{
+    private readonly string[] _data;
+    private int _pos;
+
+    private bool _filtering;
+
+    public TextLineFilter(string[] data)
+    {
+        _data = data;
+        _filtering = string.IsNullOrEmpty(_data[0]);
+        _pos = _filtering ? 1 : 0;
+    }
+
+    public bool CanWrite(string input)
+    {
+        if (_pos < _data.Length)
+        {
+            var match = System.Text.RegularExpressions.Regex.IsMatch(input, _data[_pos]);
+            if (match)
+            {
+                _pos++;
+                _filtering = !_filtering;
+            }
+        }
+
+        return !_filtering;
+    }
+}
