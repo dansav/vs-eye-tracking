@@ -109,7 +109,7 @@ Task("Test")
 Task("Publish")
     .IsDependentOn("Publish.Prepare")
     .IsDependentOn("Publish.UploadToVsixGallery")
-    //.IsDependentOn("Publish.UploadToVisualStudioMarketplace")
+    .IsDependentOn("Publish.UploadToVisualStudioMarketplace")
     ;
 
 Task("Publish.Prepare")
@@ -153,11 +153,28 @@ Task("Publish.UploadToVisualStudioMarketplace")
     .WithCriteria(() => version.BranchName == "master" && !BuildSystem.IsLocalBuild && !BuildSystem.IsPullRequest)
     .Does(() => 
 {
-    /*
-        Compile info from these links to create the correct upload script:
-        * https://docs.microsoft.com/en-us/visualstudio/extensibility/walkthrough-publishing-a-visual-studio-extension-via-command-line?view=vs-2019
-        * https://www.meziantou.net/ci-cd-pipeline-for-a-visual-studio-extension-vsix-using-azure-devops.htm
-    */
+    var manifest = sourceDir + File("extension-manifest.json");
+    var file = GetFiles($"{publishDir}/*.vsix").First();
+    var token = EnvironmentVariable("VSMARKETPLACE_TOKEN");
+
+    Information($"Found file to publish: {file}");
+
+    if (string.IsNullOrEmpty(token))
+    {
+        throw new Exception("Could not access PAT for publishing on VS Marketplace");
+    }
+
+    var installationPath = VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.VisualStudio.Component.VSSDK" });
+    var publisherPath = installationPath + File("/VSSDK/VisualStudioIntegration/Tools/Bin/VsixPublisher.exe");
+    var exitCode = StartProcess(publisherPath,  new ProcessSettings
+    {
+        Arguments = $"publish -payload {file} -publishManifest {manifest} -personalAccessToken {token}"
+    });
+
+    if (exitCode != 0)
+    {
+       Error($"publisher exit code: '{exitCode}'");
+    }
 });
 
 //////////////////////////////////////////////////////////////////////
