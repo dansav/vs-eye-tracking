@@ -16,7 +16,7 @@ See the [change log](CHANGELOG.md) for changes and road map.
 ## Prerequisites
 
 * Visual Studio 2019
-* An eye trackers from [Tobii](https://gaming.tobii.com/products/)
+* An eye tracker from [Tobii](https://gaming.tobii.com/products/)
 
 ## Configuration
 
@@ -42,10 +42,10 @@ And when you look in the lower half of the editor view, the scroll direction is 
 
 These are the available scroll profiles:
 
-- _Static_: with no fancy acceleration/deacceleration just a constant scroll speed.
-- _Linear_: You can specify how long it will take to accelerate to max scroll speed.
-- _Exponential_: Has both acceleration and deacceleration (inertia).
-- _Dynamic_: Continuously modifies the scroll speed, and direction, depending on distance between your current gaze point and the vertical center of the document window.
+* _Static_: with no fancy acceleration/deacceleration just a constant scroll speed.
+* _Linear_: You can specify how long it will take to accelerate to max scroll speed.
+* _Exponential_: Has both acceleration and deacceleration (inertia).
+* _Dynamic_: Continuously modifies the scroll speed, and direction, depending on distance between your current gaze point and the vertical center of the document window.
 
 ### Move caret
 
