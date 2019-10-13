@@ -109,7 +109,7 @@ Task("Test")
 Task("Publish")
     .IsDependentOn("Publish.Prepare")
     .IsDependentOn("Publish.UploadToVsixGallery")
-    //.IsDependentOn("Publish.UploadToVisualStudioMarketplace")
+    .IsDependentOn("Publish.UploadToVisualStudioMarketplace")
     ;
 
 Task("Publish.Prepare")
@@ -149,15 +149,59 @@ Task("Publish.UploadToVsixGallery")
     Information("Done!");
 });
 
+Task("Publish.PreProcessReadmeFile").Does(() => 
+{
+    var filter = new TextLineFilter(new []
+    {
+        "",
+        "^#",
+        "^## Status",
+        "^#",
+    });
+
+    var readme = System.IO.File.OpenRead(MakeAbsolute(File("README.md")).FullPath);
+    var readmeCopy = System.IO.File.Create(MakeAbsolute(outputDir + File("README.md")).FullPath);
+    using (var reader = new StreamReader(readme))
+    using (var writer = new StreamWriter(readmeCopy))
+    {
+        while (!reader.EndOfStream)
+        {
+            var line = reader.ReadLine();
+            if (filter.CanWrite(line))
+            {
+                writer.WriteLine(line);
+            }
+        }
+    }
+});
+
 Task("Publish.UploadToVisualStudioMarketplace")
     .WithCriteria(() => version.BranchName == "master" && !BuildSystem.IsLocalBuild && !BuildSystem.IsPullRequest)
+    .IsDependentOn("Publish.PreProcessReadmeFile")
     .Does(() => 
 {
-    /*
-        Compile info from these links to create the correct upload script:
-        * https://docs.microsoft.com/en-us/visualstudio/extensibility/walkthrough-publishing-a-visual-studio-extension-via-command-line?view=vs-2019
-        * https://www.meziantou.net/ci-cd-pipeline-for-a-visual-studio-extension-vsix-using-azure-devops.htm
-    */
+    var manifest = sourceDir + File("extension-manifest.json");
+    var file = GetFiles($"{publishDir}/*.vsix").First();
+    var token = EnvironmentVariable("VSMARKETPLACE_TOKEN");
+
+    Information($"Found file to publish: {file}");
+
+    if (string.IsNullOrEmpty(token))
+    {
+        throw new Exception("Could not access PAT for publishing on VS Marketplace");
+    }
+
+    var installationPath = VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.VisualStudio.Component.VSSDK" });
+    var publisherPath = installationPath + File("/VSSDK/VisualStudioIntegration/Tools/Bin/VsixPublisher.exe");
+    var exitCode = StartProcess(publisherPath,  new ProcessSettings
+    {
+        Arguments = $"publish -payload {file} -publishManifest {manifest} -personalAccessToken {token}"
+    });
+
+    if (exitCode != 0)
+    {
+       Error($"publisher exit code: '{exitCode}'");
+    }
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -177,3 +221,33 @@ Task("Default")
 //////////////////////////////////////////////////////////////////////
 
 RunTarget(target);
+
+public class TextLineFilter
+{
+    private readonly string[] _data;
+    private int _pos;
+
+    private bool _filtering;
+
+    public TextLineFilter(string[] data)
+    {
+        _data = data;
+        _filtering = string.IsNullOrEmpty(_data[0]);
+        _pos = _filtering ? 1 : 0;
+    }
+
+    public bool CanWrite(string input)
+    {
+        if (_pos < _data.Length)
+        {
+            var match = System.Text.RegularExpressions.Regex.IsMatch(input, _data[_pos]);
+            if (match)
+            {
+                _pos++;
+                _filtering = !_filtering;
+            }
+        }
+
+        return !_filtering;
+    }
+}

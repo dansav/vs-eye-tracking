@@ -3,7 +3,7 @@
 - [ ] Some kind of error reporting in UI and maybe upload to remote service
 - [x] Custom UI on the options page
   - [x] Sliders for delay- and timeout-values (to keep within a sensible range)
-  - [x] Show basic eye tracker status
+  - [ ] Show basic eye tracker status
 
 Features that have a checkmark are complete and available for
 download in the
@@ -13,6 +13,10 @@ download in the
 
 These are the changes to each version that has been released
 on the official Visual Studio extension gallery.
+
+## 0.6
+
+- Mostly changes in build scripts and text files
 
 ## 0.5
 

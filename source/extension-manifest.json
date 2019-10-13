@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json.schemastore.org/vsix-publish",
+  "categories": [ "other" ],
+  "identity": {
+      "internalName": "vs-eye-tracking"
+  },
+  "overview": "../output/README.md",
+  "assetFiles": [
+    {
+        "pathOnDisk": "..\\docs\\options_gui.png",
+        "targetPath": "docs/options_gui.png"
+    }
+  ],
+  "priceCategory": "free",
+  "publisher": "dansav",
+  "private": false,
+  "qna": true,
+  "repo": "https://github.com/dansav/vs-eye-tracking"
+}
