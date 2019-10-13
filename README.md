@@ -2,7 +2,7 @@
 
 # Eye Tracking for Visual Studio
 
-Extension for Visual Studio using eye tracking
+Extension for Visual Studio using eye tracking.
 
 ## Status
 
@@ -12,6 +12,11 @@ master |  [![Build Status](https://danielsa.visualstudio.com/vs-eye-tracking/_ap
 develop | [![Build Status](https://danielsa.visualstudio.com/vs-eye-tracking/_apis/build/status/vs-eye-tracking-CI?branchName=develop)](https://danielsa.visualstudio.com/vs-eye-tracking/_build/latest?definitionId=14&branchName=develop)
 
 See the [change log](CHANGELOG.md) for changes and road map.
+
+## Prerequisites
+
+* Visual Studio 2019
+* An eye trackers from [Tobii](https://gaming.tobii.com/products/)
 
 ## Configuration
 
