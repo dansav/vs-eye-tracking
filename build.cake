@@ -125,8 +125,8 @@ Task("Publish.Prepare")
 });
 
 Task("Publish.UploadToVsixGallery")
-    // TODO: when it is time to publish to VS Marketplace, change this to target develop-branch and/or release-branches
-    .WithCriteria(() => version.BranchName == "master" && !BuildSystem.IsLocalBuild && !BuildSystem.IsPullRequest)
+    // TODO: change this to target develop-branch instead of master
+    .WithCriteria(() => (version.BranchName == "master" || version.BranchName?.StartsWith("release/") == true) && !BuildSystem.IsLocalBuild && !BuildSystem.IsPullRequest)
     .Does(() =>
 {
     var file = GetFiles($"{publishDir}/*.vsix").First();

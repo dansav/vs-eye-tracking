@@ -8,8 +8,8 @@ Extension for Visual Studio using eye tracking.
 
 Branch | Status | Download
 ------ | ------ | --------
-master |  [![Build Status](https://danielsa.visualstudio.com/vs-eye-tracking/_apis/build/status/vs-eye-tracking-CI?branchName=master)](https://danielsa.visualstudio.com/vs-eye-tracking/_build/latest?definitionId=14&branchName=master) | [CI Build](http://vsixgallery.com/extension/65bd244c-48a0-46af-953a-0fb433e5343d/)
-develop | [![Build Status](https://danielsa.visualstudio.com/vs-eye-tracking/_apis/build/status/vs-eye-tracking-CI?branchName=develop)](https://danielsa.visualstudio.com/vs-eye-tracking/_build/latest?definitionId=14&branchName=develop)
+master |  [![Build Status](https://danielsa.visualstudio.com/vs-eye-tracking/_apis/build/status/vs-eye-tracking-CI?branchName=master)](https://danielsa.visualstudio.com/vs-eye-tracking/_build/latest?definitionId=14&branchName=master) | [VS Marketplace](https://marketplace.visualstudio.com/items?itemName=dansav.vs-eye-tracking)
+develop | [![Build Status](https://danielsa.visualstudio.com/vs-eye-tracking/_apis/build/status/vs-eye-tracking-CI?branchName=develop)](https://danielsa.visualstudio.com/vs-eye-tracking/_build/latest?definitionId=14&branchName=develop) | [CI Build](http://vsixgallery.com/extension/65bd244c-48a0-46af-953a-0fb433e5343d/)
 
 See the [change log](CHANGELOG.md) for changes and road map.
 
